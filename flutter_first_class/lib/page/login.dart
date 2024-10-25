@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_first_class/page/signup.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Login extends StatelessWidget {
@@ -56,6 +57,22 @@ class Login extends StatelessWidget {
                 ),
               ),
             ),
+            SizedBox(height: 15,),
+
+            TextButton(
+                onPressed: (){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context)=>Signup()),
+                  );
+                },
+                child: Text("Registration",
+                style: TextStyle(
+                  color: Colors.lightGreenAccent,
+                  decoration: TextDecoration.underline
+                ),
+                )
+            )
           ],
         ),
       ),

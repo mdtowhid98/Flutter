@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   date_field: ^5.2.0
   http: ^1.2.2
+  flutter_secure_storage: ^7.0.1
+  jwt_decode: ^0.3.1
 
 dev_dependencies:
   flutter_test:

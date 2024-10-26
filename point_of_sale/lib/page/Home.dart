@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:point_of_sale/page/Branch.dart';
 import 'package:point_of_sale/page/Category.dart';
 import 'package:point_of_sale/page/Supplier.dart'; // Ensure this import is present
 
@@ -43,7 +44,7 @@ class _HomeState extends State<Home> {
   }
 
   void _startAutoPageChange() {
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       setState(() {
         _carouselIndex = (_carouselIndex + 1) % _texts.length;
       });
@@ -76,6 +77,7 @@ class _HomeState extends State<Home> {
     {"img": "https://cdn-icons-png.flaticon.com/128/12668/12668466.png", "title": "Manufacture"},
     {"img": "https://cdn-icons-png.flaticon.com/128/1362/1362944.png", "title": "Category"},
     {"img": "https://cdn-icons-png.flaticon.com/128/3321/3321752.png", "title": "Supplier"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/13163/13163163.png", "title": "Branch"},
   ];
 
   @override
@@ -137,7 +139,7 @@ class _HomeState extends State<Home> {
                       child: Text(
                         _texts[index],
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),
                       ),
                     ),
                   );
@@ -167,14 +169,19 @@ class _HomeState extends State<Home> {
                           context,
                           MaterialPageRoute(builder: (context) => Supplier()),
                         );
+                      }else if (index == 20) {  // Navigate to Supplier
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Branch()),
+                        );
                       }
                     },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          width: 70,
-                          height: 70,
+                          width: 50,
+                          height: 50,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white,

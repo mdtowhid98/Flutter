@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:point_of_sale/page/Category.dart';
 import 'package:point_of_sale/page/Home.dart';
 
 

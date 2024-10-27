@@ -17,7 +17,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final TextEditingController confirmPassword = TextEditingController();
   final TextEditingController cell = TextEditingController();
   final TextEditingController address = TextEditingController();
-  final DateTimeFieldPickerPlatform dob = DateTimeFieldPickerPlatform.material;
 
   String? selectedGender;
   DateTime? selectedDOB;
@@ -59,7 +58,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       String gender,
       String dob,
       ) async {
-    const String url = 'http://localhost:8087/register'; // Android emulator
+    const String url = 'http://localhost:8087/register'; // Adjust this for your backend
     final response = await http.post(
       Uri.parse(url),
       headers: {'Content-Type': 'application/json'},
@@ -96,6 +95,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
+                color: Colors.red,
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: Form(
@@ -105,7 +105,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       children: [
                         Text(
                           'Register',
-                          style: GoogleFonts.lato(fontSize: 24, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.lato(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
                         ),
                         SizedBox(height: 20),
                         _buildTextField(name, 'Full Name', Icons.person),
@@ -129,9 +129,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         _buildTextField(address, 'Address', Icons.maps_home_work_rounded),
                         SizedBox(height: 16),
                         DateTimeFormField(
-                          decoration: const InputDecoration(labelText: 'Date of Birth'),
+                          decoration: const InputDecoration(labelText: 'Date of Birth', labelStyle: TextStyle(color: Colors.white)),
                           mode: DateTimeFieldPickerMode.date,
-                          pickerPlatform: dob,
+                          pickerPlatform: DateTimeFieldPickerPlatform.material,
                           onChanged: (DateTime? value) {
                             setState(() {
                               selectedDOB = value;
@@ -160,7 +160,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                           },
                           child: Text(
                             'Already have an account? Login',
-                            style: TextStyle(color: Colors.black, decoration: TextDecoration.underline),
+                            style: TextStyle(color: Colors.white, decoration: TextDecoration.underline),
                           ),
                         ),
                       ],
@@ -180,11 +180,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
+        labelStyle: TextStyle(color: Colors.white),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.white),
         ),
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: Colors.white),
+        contentPadding: EdgeInsets.symmetric(vertical: 8), // Adjust vertical padding for smaller height
+        isDense: true, // Makes the text field more compact
       ),
+      style: TextStyle(color: Colors.white, fontSize: 12),
     );
   }
 
@@ -193,25 +198,30 @@ class _RegistrationPageState extends State<RegistrationPage> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
+        labelStyle: TextStyle(color: Colors.white),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.white),
         ),
-        prefixIcon: Icon(Icons.lock),
+        prefixIcon: Icon(Icons.lock, color: Colors.white),
         suffixIcon: IconButton(
-          icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off),
+          icon: Icon(isVisible ? Icons.visibility : Icons.visibility_off, color: Colors.white),
           onPressed: () {
             onToggleVisibility(!isVisible);
           },
         ),
+        contentPadding: EdgeInsets.symmetric(vertical: 8), // Adjust vertical padding for smaller height
+        isDense: true, // Makes the text field more compact
       ),
       obscureText: !isVisible,
+      style: TextStyle(color: Colors.white, fontSize: 12),
     );
   }
 
   Widget _buildGenderSelection() {
     return Row(
       children: [
-        Text('Gender:'),
+        Text('Gender:', style: TextStyle(color: Colors.white)),
         Expanded(
           child: Row(
             children: [
@@ -224,7 +234,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   });
                 },
               ),
-              Text('Male'),
+              Text('Male', style: TextStyle(color: Colors.white)),
             ],
           ),
         ),
@@ -240,7 +250,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   });
                 },
               ),
-              Text('Female'),
+              Text('Female', style: TextStyle(color: Colors.white)),
             ],
           ),
         ),
@@ -256,7 +266,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   });
                 },
               ),
-              Text('Other'),
+              Text('Other', style: TextStyle(color: Colors.white)),
             ],
           ),
         ),

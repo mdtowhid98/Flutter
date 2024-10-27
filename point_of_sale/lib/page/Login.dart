@@ -70,6 +70,7 @@ class _LoginState extends State<Login> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
+              color: Colors.red,
               child: Padding(
                 padding: EdgeInsets.all(20.0),
                 child: Column(
@@ -80,6 +81,7 @@ class _LoginState extends State<Login> {
                       style: GoogleFonts.lato(
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
                     ),
                     SizedBox(height: 20),
@@ -117,7 +119,7 @@ class _LoginState extends State<Login> {
                       child: Text(
                         'Registration',
                         style: TextStyle(
-                          color: Colors.blue,
+                          color: Colors.white,
                           decoration: TextDecoration.underline,
                         ),
                       ),
@@ -137,27 +139,36 @@ class _LoginState extends State<Login> {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
+        labelStyle: TextStyle(color: Colors.white),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.white),
         ),
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(icon, color: Colors.white),
+        contentPadding: EdgeInsets.symmetric(vertical: 8), // Adjust vertical padding for smaller height
+        isDense: true, // Makes the text field more compact
       ),
+      style: TextStyle(color: Colors.white),
     );
   }
 
   Widget _buildPasswordField() {
     return TextField(
+
+
       controller: password,
       decoration: InputDecoration(
         labelText: "Password",
+        labelStyle: TextStyle(color: Colors.white),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
+          borderSide: BorderSide(color: Colors.white),
         ),
-        prefixIcon: Icon(Icons.lock),
+        prefixIcon: Icon(Icons.lock, color: Colors.white),
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-            color: Colors.grey,
+            color: Colors.white,
           ),
           onPressed: () {
             setState(() {
@@ -165,8 +176,11 @@ class _LoginState extends State<Login> {
             });
           },
         ),
+        contentPadding: EdgeInsets.symmetric(vertical: 8), // Adjust vertical padding for smaller height
+        isDense: true, // Makes the text field more compact
       ),
       obscureText: !_isPasswordVisible,
+      style: TextStyle(color: Colors.white),
     );
   }
 }

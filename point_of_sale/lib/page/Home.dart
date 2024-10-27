@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/page/Branch.dart';
 import 'package:point_of_sale/page/Category.dart';
-import 'package:point_of_sale/page/Supplier.dart'; // Ensure this import is present
+import 'package:point_of_sale/page/Supplier.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -117,101 +117,117 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      body: Container(
-        color: Colors.grey[100],
-        child: Column(
-          children: [
-            // Carousel
-            Container(
-              height: 80,
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: _texts.length,
-                onPageChanged: (index) {
-                  setState(() {
-                    _carouselIndex = index;
-                  });
-                },
-                itemBuilder: (context, index) {
-                  return Container(
-                    color: _colors[index],
-                    child: Center(
-                      child: Text(
-                        _texts[index],
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 15, color: Colors.black, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-            // GridView
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 0,
-                  mainAxisSpacing: 0,
-                  childAspectRatio: 1.2,
-                ),
-                itemCount: myItems.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      if (index == 18) {  // Navigate to Category
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Category()),
-                        );
-                      } else if (index == 19) {  // Navigate to Supplier
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Supplier()),
-                        );
-                      }else if (index == 20) {  // Navigate to Supplier
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Branch()),
-                        );
-                      }
+      body: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Container(
+          color: Colors.grey[100],
+          child: Column(
+            children: [
+              // Carousel
+              ClipRRect(
+                borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+                child: Container(
+                  height: 80,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: _texts.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _carouselIndex = index;
+                      });
                     },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                            image: DecorationImage(
-                              image: NetworkImage(myItems[index]["img"]!),
-                              fit: BoxFit.cover,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        color: _colors[index],
+                        child: Center(
+                          child: Text(
+                            _texts[index],
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                              fontStyle: FontStyle.italic,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          myItems[index]["title"]!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  );
-                },
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
-          ],
+              // GridView
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 15,
+                    mainAxisSpacing: 15,
+                    childAspectRatio: 1.2,
+                  ),
+                  itemCount: myItems.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        if (index == 18) {  // Navigate to Category
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Category()),
+                          );
+                        } else if (index == 19) {  // Navigate to Supplier
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Supplier()),
+                          );
+                        } else if (index == 20) {  // Navigate to Branch
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => Branch()),
+                          );
+                        }
+                      },
+                      child: Card(
+                        elevation: 3, // Adjust the elevation for shadow effect
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10), // Rounded corners
+                        ),
+                        child: Container(
+                          height: 50,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white,
+                                  image: DecorationImage(
+                                    image: NetworkImage(myItems[index]["img"]!),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                myItems[index]["title"]!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w100,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

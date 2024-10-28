@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:signup_spring/page/All_Product_view.dart';
 import 'package:signup_spring/page/Login.dart';
 import 'package:signup_spring/page/Registration.dart';
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Login(),
+      home: AllProductView(),
     );
 
   }

@@ -22,3 +22,21 @@ class BranchService {
     }
   }
 }
+
+class CreateBranchService {
+  final String apiUrl = 'http://localhost:8087/api/branch/save';
+
+  Future<http.Response> createBranch(String branchName, String location) async {
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'name': branchName,
+        'location': location,
+
+      }), // Adjusted to use lowercase keys
+    );
+
+    return response;
+  }
+}

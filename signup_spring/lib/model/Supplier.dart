@@ -1,9 +1,8 @@
-
 class Supplier {
   int? id;
   String? name;
   String? email;
-  int? cell;
+  int? cell; // Changed from int to String
   String? address;
 
   Supplier({this.id, this.name, this.email, this.cell, this.address});
@@ -17,7 +16,7 @@ class Supplier {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
+    final Map<String, dynamic> data = {};
     data['id'] = this.id;
     data['name'] = this.name;
     data['email'] = this.email;

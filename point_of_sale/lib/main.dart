@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:point_of_sale/page/Category.dart';
+
 import 'package:point_of_sale/page/Home.dart';
 import 'package:point_of_sale/page/Login.dart';
 import 'package:point_of_sale/page/Registration.dart';
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Login(),
+      home: Home(),
     );
 
   }

@@ -47,18 +47,7 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-//    public void saveProduct(Product product, MultipartFile imageFile) throws IOException {
-//
-//        Category category = categoryRepository.findById(product.getCategory().getId())
-//                .orElseThrow(() -> new RuntimeException("Category with this id not found"));
-//
-//        if (imageFile != null && !imageFile.isEmpty()) {
-//            String imageFileName = saveImage(imageFile, product);
-//            product.setPhoto(imageFileName);
-//        }
-//
-//        productRepository.save(product);
-//    }
+
 
 
     public ApiResponse saveProduct(Product product, MultipartFile imageFile) throws IOException {

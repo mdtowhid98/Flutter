@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:point_of_sale/page/Branch.dart';
-import 'package:point_of_sale/page/Category.dart';
-import 'package:point_of_sale/page/Supplier.dart'; // Ensure this import is present
+// import 'package:point_of_sale/page/Branch.dart';
+// import 'package:point_of_sale/page/Category.dart';
+// import 'package:point_of_sale/page/Supplier.dart'; // Ensure this import is present
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -158,24 +158,24 @@ class _HomeState extends State<Home> {
                 itemCount: myItems.length,
                 itemBuilder: (context, index) {
                   return GestureDetector(
-                    onTap: () {
-                      if (index == 18) {  // Navigate to Category
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Category()),
-                        );
-                      } else if (index == 19) {  // Navigate to Supplier
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Supplier()),
-                        );
-                      }else if (index == 20) {  // Navigate to Supplier
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Branch()),
-                        );
-                      }
-                    },
+                    // onTap: () {
+                    //   if (index == 18) {  // Navigate to Category
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (context) => Category()),
+                    //     );
+                    //   } else if (index == 19) {  // Navigate to Supplier
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (context) => Supplier()),
+                    //     );
+                    //   }else if (index == 20) {  // Navigate to Supplier
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(builder: (context) => Branch()),
+                    //     );
+                    //   }
+                    // },
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

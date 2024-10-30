@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:point_of_sale/page/Branch.dart';
-import 'package:point_of_sale/page/Category.dart';
-import 'package:point_of_sale/page/Supplier.dart';
+
+import 'package:point_of_sale/page/branch/AllBranchView.dart';
+import 'package:point_of_sale/page/category/AllCategoryView.dart';
+import 'package:point_of_sale/page/product/AllProductView.dart';
+import 'package:point_of_sale/page/supplier/AllSupplierView.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -172,17 +174,22 @@ class _HomeState extends State<Home> {
                         if (index == 18) {  // Navigate to Category
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Category()),
+                            MaterialPageRoute(builder: (context) => AllCategoryView()),
                           );
                         } else if (index == 19) {  // Navigate to Supplier
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Supplier()),
+                            MaterialPageRoute(builder: (context) => AllSupplierView()),
                           );
                         } else if (index == 20) {  // Navigate to Branch
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => Branch()),
+                            MaterialPageRoute(builder: (context) => AllBranchesView()),
+                          );
+                        }else if (index == 0) {  // Navigate to Branch
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AllProductView()),
                           );
                         }
                       },

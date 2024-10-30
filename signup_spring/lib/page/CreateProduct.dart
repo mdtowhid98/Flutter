@@ -9,10 +9,8 @@ import 'package:signup_spring/model/Product.dart';
 import 'package:signup_spring/model/Supplier.dart';
 import 'package:signup_spring/service/Branch_Service.dart';
 import 'package:signup_spring/service/Category_Service.dart';
-
 import 'package:signup_spring/service/Product_Service.dart';
 import 'package:signup_spring/service/Supplier_Service.dart';
-// import 'package:signup_spring/service/CreateProductService.dart'; // Ensure this import is correct
 import 'package:signup_spring/page/All_Product_view.dart';
 
 class CreateProduct extends StatefulWidget {
@@ -33,9 +31,7 @@ class _CreateProductState extends State<CreateProduct> {
   DateTime? selectedExpiryDate;
 
   final _formKey = GlobalKey<FormState>();
-  // final CreateProductService createProductService = CreateProductService();
-  final CreateProductService createProductService=CreateProductService()
-  ;
+  final CreateProductService createProductService = CreateProductService();
 
   List<Category> categories = [];
   List<Supplier> suppliers = [];
@@ -56,6 +52,8 @@ class _CreateProductState extends State<CreateProduct> {
       categories = await CategoryService().fetchCategories();
       suppliers = await SupplierService().fetchSuppliers();
       branches = await BranchService().fetchBranches();
+
+      print("Fetched branches: ${branches.length}"); // Debugging line
       setState(() {});
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -95,6 +93,7 @@ class _CreateProductState extends State<CreateProduct> {
         return;
       }
 
+      // Fetch values from controllers
       String pName = productNameController.text;
       int pStock = int.parse(stockController.text);
       int pQuantity = int.parse(quantityController.text);
@@ -306,7 +305,7 @@ class _CreateProductState extends State<CreateProduct> {
                   items: branches.map<DropdownMenuItem<String>>((Branch branch) {
                     return DropdownMenuItem<String>(
                       value: branch.branchName,
-                      child: Text(branch.branchName ?? ''),
+                      child: Text(branch.branchName ?? 'Unknown Branch'),
                     );
                   }).toList(),
                 ),

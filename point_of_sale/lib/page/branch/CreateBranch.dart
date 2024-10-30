@@ -11,39 +11,58 @@ class CreateBranch extends StatefulWidget {
 }
 
 class _CreateBranchState extends State<CreateBranch> {
-
-  final TextEditingController branchName = TextEditingController();
-  final TextEditingController branchLocation = TextEditingController();
+  final TextEditingController branchNameController = TextEditingController();
+  final TextEditingController branchLocationController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
   final CreateBranchService branchService = CreateBranchService();
 
-
   void _createBranch() async {
     if (_formKey.currentState!.validate()) {
-      String bName = branchName.text;
-      String blocation = branchLocation.text;
+      String bName = branchNameController.text;
+      String blocation = branchLocationController.text;
 
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Center(child: CircularProgressIndicator()),
+      );
 
-      final response = await branchService.createBranch(bName, blocation);
+      try {
+        final response = await branchService.createBranch(bName, blocation);
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        print('Branch created successfully!');
-        branchName.clear();
-        branchLocation.clear();
+        Navigator.pop(context); // Close loading indicator
 
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AllBranchesView()),
+        if (response.statusCode == 201 || response.statusCode == 200) {
+          print('Branch created successfully!');
+          branchNameController.clear();
+          branchLocationController.clear();
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AllBranchesView()),
+          );
+        } else if (response.statusCode == 409) {
+          print('Branch already exists!');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Branch already exists!')),
+          );
+        } else {
+          print('Branch creation failed with status: ${response.statusCode}');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Branch creation failed!')),
+          );
+        }
+      } catch (e) {
+        Navigator.pop(context); // Close loading indicator
+        print('Error: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
         );
-      } else if (response.statusCode == 409) {
-        print('Supplier already exists!');
-      } else {
-        print('Supplier creation failed with status: ${response.statusCode}');
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +77,7 @@ class _CreateBranchState extends State<CreateBranch> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextFormField(
-                  controller: branchName,
+                  controller: branchNameController,
                   decoration: InputDecoration(
                     labelText: 'Branch Name',
                     border: OutlineInputBorder(),
@@ -73,7 +92,7 @@ class _CreateBranchState extends State<CreateBranch> {
                 ),
                 SizedBox(height: 20),
                 TextFormField(
-                  controller: branchLocation,
+                  controller: branchLocationController,
                   decoration: InputDecoration(
                     labelText: 'Location',
                     border: OutlineInputBorder(),
@@ -86,12 +105,11 @@ class _CreateBranchState extends State<CreateBranch> {
                     return null;
                   },
                 ),
-
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _createBranch,
                   child: Text(
-                    "Create Supplier", // Updated button text
+                    "Create Branch",
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(

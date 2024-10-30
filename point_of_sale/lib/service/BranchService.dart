@@ -33,10 +33,9 @@ class CreateBranchService {
       Uri.parse(apiUrl),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'name': branchName,
+        'branchName': branchName, // Updated to use 'branchName'
         'location': location,
-
-      }), // Adjusted to use lowercase keys
+      }),
     );
 
     return response;

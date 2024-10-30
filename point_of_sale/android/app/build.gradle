@@ -6,7 +6,8 @@ plugins {
 }
 
 android {
-    namespace = "com.towhid.point_of_sale"
+    namespace = "com.towhid.point_" +
+            "of_sale"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

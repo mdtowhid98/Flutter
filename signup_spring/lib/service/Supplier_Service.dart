@@ -15,6 +15,31 @@ class SupplierService {
       throw Exception('Failed to load suppliers');
     }
   }
+
+  Future<void> updateSupplier(int id, Supplier supplier) async {
+    final response = await http.put(
+      Uri.parse('http://localhost:8087/api/supplier/update/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(supplier.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update supplier');
+    }
+  }
+
+
+  Future<void> deleteSupplier(int? id) async {
+    final response = await http
+        .delete(Uri.parse('http://localhost:8087/api/supplier/delete/$id'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete supplier');
+    }
+  }
+
+
 }
 
 class CreateSupplierService {

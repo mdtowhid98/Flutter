@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signup_spring/model/Branch.dart';
+import 'package:signup_spring/page/UpdateBranch.dart';
 import 'package:signup_spring/service/Branch_Service.dart';
 
 class AllBranchesView extends StatefulWidget {
@@ -16,6 +17,24 @@ class _AllBranchesViewState extends State<AllBranchesView> {
   void initState() {
     super.initState();
     futureBranches = BranchService().fetchBranches();
+  }
+
+  Future<void> _deleteBranch(Branch branch) async {
+    await BranchService().deleteBranch(branch.id);
+    setState(() {
+      futureBranches = BranchService().fetchBranches();
+    });
+  }
+
+  void _updateBranch(Branch branch) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UpdateBranchView(branch: branch)),
+    ).then((_) {
+      setState(() {
+        futureBranches = BranchService().fetchBranches();
+      });
+    });
   }
 
   @override
@@ -63,6 +82,45 @@ class _AllBranchesViewState extends State<AllBranchesView> {
                         Text(
                           'Location: ${branch.location ?? 'No location available'}',
                           style: TextStyle(color: Colors.grey[600]),
+                        ),
+                        SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () => _updateBranch(branch),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text('Delete Branch'),
+                                      content: Text('Are you sure you want to delete this branch?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            _deleteBranch(branch); // Fixed the call here
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Delete'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),

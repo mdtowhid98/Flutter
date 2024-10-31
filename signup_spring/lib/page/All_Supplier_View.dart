@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signup_spring/model/Supplier.dart';
+import 'package:signup_spring/page/UpdateSupplier.dart';
 import 'package:signup_spring/service/Supplier_Service.dart';
 
 class AllSupplierView extends StatefulWidget {
@@ -17,6 +18,25 @@ class _AllSupplierViewState extends State<AllSupplierView> {
     super.initState();
     futureSuppliers = SupplierService().fetchSuppliers();
   }
+
+  Future<void> _deleteSupplier(Supplier supplier) async {
+    await SupplierService().deleteSupplier(supplier.id);
+    setState(() {
+      futureSuppliers = SupplierService().fetchSuppliers();
+    });
+  }
+
+  void _updateSupplier(Supplier supplier) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UpdateSupplierView(supplier: supplier)),
+    ).then((_) {
+      setState(() {
+        futureSuppliers = SupplierService().fetchSuppliers();
+      });
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +89,45 @@ class _AllSupplierViewState extends State<AllSupplierView> {
                         Text(
                           'Address: ${supplier.address ?? 'No address available'}',
                           style: TextStyle(color: Colors.grey[600]),
+                        ),
+                        SizedBox(height: 16,),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.edit),
+                              onPressed: () => _updateSupplier(supplier),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text('Delete Supplier'),
+                                      content: Text('Are you sure you want to delete this Supplier?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Cancel'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            _deleteSupplier(supplier); // Fixed the call here
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Delete'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),

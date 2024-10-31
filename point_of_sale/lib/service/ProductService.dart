@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'package:point_of_sale/model/ProductModel.dart';
 
 class ProductService {
-  final String apiUrl = 'http://10.0.2.2:8087/api/product/';
+  final String apiUrl = 'http://localhost:8087/api/product/';
 
   Future<List<Product>> fetchProducts() async {
     final response = await http.get(Uri.parse(apiUrl));
@@ -25,7 +25,7 @@ class CreateProductService {
   Future<Product> createProduct(Product product, File? image) async {
     var request = http.MultipartRequest(
       "POST",
-      Uri.parse("http://10.0.2.2:8087/api/product/save"),
+      Uri.parse("http://localhost:8087/api/product/save"),
     );
 
     request.fields['product'] = json.encode(product.toJson());

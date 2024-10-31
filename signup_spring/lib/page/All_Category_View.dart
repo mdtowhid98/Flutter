@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:signup_spring/model/Category.dart';
+import 'package:signup_spring/page/UpdateCategory.dart';
 import 'package:signup_spring/service/Category_Service.dart';
 
 class AllCategoryView extends StatefulWidget {
@@ -18,6 +19,28 @@ class _AllCategoryViewState extends State<AllCategoryView> {
     futureCategories = CategoryService().fetchCategories();
   }
 
+  Future<void> _deleteCategory(Category category) async {
+    // Call the delete method from the service
+    await CategoryService().deleteCategory(category.id);
+    // Refresh the category list
+    setState(() {
+      futureCategories = CategoryService().fetchCategories();
+    });
+  }
+
+  void _updateCategory(Category category) {
+    // Navigate to an update screen (you'll need to implement this)
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UpdateCategoryView(category: category)),
+    ).then((_) {
+      // Refresh the category list after update
+      setState(() {
+        futureCategories = CategoryService().fetchCategories();
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,9 +50,7 @@ class _AllCategoryViewState extends State<AllCategoryView> {
         backgroundColor: Colors.teal,
       ),
       body: FutureBuilder<List<Category>>(
-
         future: futureCategories,
-
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -53,8 +74,46 @@ class _AllCategoryViewState extends State<AllCategoryView> {
                     child: ListTile(
                       title: Text('ID: ${category.id ?? 'Unnamed ID'}'),
                       subtitle: Text(
-                        'Category Name:${category.categoryname ?? 'No category available'}',
+                        'Category Name: ${category.categoryname ?? 'No category available'}',
                         style: TextStyle(color: Colors.grey[600]),
+                      ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () => _updateCategory(category),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.delete, color: Colors.red),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text('Delete Category'),
+                                    content: Text('Are you sure you want to delete this category?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          _deleteCategory(category);
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: Text('Delete'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -67,3 +126,5 @@ class _AllCategoryViewState extends State<AllCategoryView> {
     );
   }
 }
+
+

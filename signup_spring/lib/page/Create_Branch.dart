@@ -90,7 +90,7 @@ class _CreateBranchState extends State<CreateBranch> {
                 ElevatedButton(
                   onPressed: _createBranch,
                   child: Text(
-                    "Create Supplier", // Updated button text
+                    "Create Branch", // Updated button text
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                   style: ElevatedButton.styleFrom(

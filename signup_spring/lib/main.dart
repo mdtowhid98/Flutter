@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:signup_spring/page/All_Branches_View.dart';
+import 'package:signup_spring/page/All_Category_View.dart';
 import 'package:signup_spring/page/All_Product_view.dart';
+import 'package:signup_spring/page/All_Supplier_View.dart';
 import 'package:signup_spring/page/CreateProduct.dart';
 import 'package:signup_spring/page/Create_Branch.dart';
 import 'package:signup_spring/page/Create_Category.dart';
@@ -20,7 +23,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: CreateBranch(),
+      home: AllSupplierView(),
     );
 
   }

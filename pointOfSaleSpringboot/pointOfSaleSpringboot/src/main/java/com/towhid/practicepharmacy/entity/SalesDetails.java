@@ -20,9 +20,7 @@ public class SalesDetails {
     @JoinColumn(name = "sales_id", nullable = false)
     private Sales sale; // Reference back to Sales
 
-//    @ManyToOne
-//    @JoinColumn(name = "sales_bonani_id", nullable = false)
-//    private BonaniBranceSales bonaniBranceSales; // Reference back to Sales
+
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)

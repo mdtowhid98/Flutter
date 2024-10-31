@@ -90,6 +90,7 @@ class _AllSupplierViewState extends State<AllSupplierView> {
                       return Card(
                         margin: EdgeInsets.all(10),
                         elevation: 4,
+
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),

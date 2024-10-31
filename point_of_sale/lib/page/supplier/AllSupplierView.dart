@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/SupplierModel.dart';
+import 'package:point_of_sale/page/supplier/UpdateSupplier.dart';
 import 'package:point_of_sale/page/supplier/CreateSupplier.dart';
 import 'package:point_of_sale/service/SupplierService.dart';
-
 
 class AllSupplierView extends StatefulWidget {
   const AllSupplierView({super.key});
@@ -20,6 +20,24 @@ class _AllSupplierViewState extends State<AllSupplierView> {
     futureSuppliers = SupplierService().fetchSuppliers();
   }
 
+  Future<void> _deleteSupplier(Supplier supplier) async {
+    await SupplierService().deleteSupplier(supplier.id);
+    setState(() {
+      futureSuppliers = SupplierService().fetchSuppliers();
+    });
+  }
+
+  void _updateSupplier(Supplier supplier) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UpdateSupplierView(supplier: supplier)),
+    ).then((_) {
+      setState(() {
+        futureSuppliers = SupplierService().fetchSuppliers();
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,20 +49,27 @@ class _AllSupplierViewState extends State<AllSupplierView> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CreateSupplier()), // Adjust this to your CreateSupplier widget
-                );
-              },
-              child: Text('Create Supplier'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal, // Button color
-                foregroundColor: Colors.white, // Text color
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              ),
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => CreateSupplier()),
+                    ).then((_) {
+                      setState(() {
+                        futureSuppliers = SupplierService().fetchSuppliers();
+                      });
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.lightGreenAccent, // Button color
+                  ),
+                  child: Text('Create Supplier'),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -91,6 +116,45 @@ class _AllSupplierViewState extends State<AllSupplierView> {
                               Text(
                                 'Address: ${supplier.address ?? 'No address available'}',
                                 style: TextStyle(color: Colors.grey[600]),
+                              ),
+                              SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: () => _updateSupplier(supplier),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text('Delete Supplier'),
+                                            content: Text('Are you sure you want to delete this supplier?'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  _deleteSupplier(supplier);
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text('Delete'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
+                                    },
+                                  ),
+                                ],
                               ),
                             ],
                           ),

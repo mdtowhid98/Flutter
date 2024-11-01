@@ -1,10 +1,12 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class AuthService {
+
   final String baseUrl = 'http://localhost:8087';
+
 
   Future<bool> login(String email, String password) async {
     final url = Uri.parse('$baseUrl/login');
@@ -34,28 +36,8 @@ class AuthService {
     }
   }
 
+
   Future<bool> register(Map<String, dynamic> user) async {
-    final url = Uri.parse('$baseUrl/register');
-    final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode(user);
-
-    final response = await http.post(url, headers: headers, body: body);
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      String token = data['token'];
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('authToken', token);
-
-      return true;
-    } else {
-      print('Failed to register: ${response.body}');
-      return false;
-    }
-  }
-
-  Future<bool> registration(Map<String, dynamic> user) async {
     final url = Uri.parse('$baseUrl/register');
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode(user);
@@ -128,4 +110,6 @@ class AuthService {
   Future<bool> isUser() async {
     return await hasRole(['USER']);
   }
+
+
 }

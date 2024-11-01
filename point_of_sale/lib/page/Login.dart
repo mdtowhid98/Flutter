@@ -4,8 +4,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
+import 'package:point_of_sale/page/AdminPage.dart';
+import 'package:point_of_sale/page/BranchProfile.dart';
 import 'package:point_of_sale/page/Home.dart';
 import 'package:point_of_sale/page/Registration.dart';
+import 'package:point_of_sale/page/category/AllCategoryView.dart';
+import 'package:point_of_sale/service/AuthService.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -18,38 +22,73 @@ class _LoginState extends State<Login> {
   final storage = FlutterSecureStorage();
   bool _isPasswordVisible = false;
 
+  AuthService authService=AuthService();
+
+
   Future<void> loginUser(BuildContext context) async {
-    final url = Uri.parse('http://localhost:8087/login');
+    try {
+      final response = await authService.login(email.text, password.text);
 
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email.text, 'password': password.text}),
-    );
+      // Successful login, role-based navigation
+      final  role =await authService.getUserRole(); // Get role from AuthService
 
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(response.body);
-      final token = responseData['token'];
 
-      Map<String, dynamic> payload = Jwt.parseJwt(token);
-      String sub = payload['sub'];
-      String role = payload['role'];
-
-      await storage.write(key: 'token', value: token);
-      await storage.write(key: 'sub', value: sub);
-      await storage.write(key: 'role', value: role);
-
-      print('Login successful. Sub: $sub, Role: $role');
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => Home()),
-      );
-    } else {
-      print('Login failed with status: ${response.statusCode}');
-      // Optionally show an error message
+      if (role == 'PHARMACIST') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => BranchProfile()),
+        );
+      } else if (role == 'ADMIN') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => AdminPage()),
+        );
+      } else if (role == 'USER') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => AllCategoryView()),
+        );
+      } else {
+        print('Unknown role: $role');
+      }
+    } catch (error) {
+      print('Login failed: $error');
     }
   }
+
+
+  // Future<void> loginUser(BuildContext context) async {
+  //   final url = Uri.parse('http://localhost:8087/login');
+  //
+  //   final response = await http.post(
+  //     url,
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({'email': email.text, 'password': password.text}),
+  //   );
+  //
+  //   if (response.statusCode == 200) {
+  //     final responseData = jsonDecode(response.body);
+  //     final token = responseData['token'];
+  //
+  //     Map<String, dynamic> payload = Jwt.parseJwt(token);
+  //     String sub = payload['sub'];
+  //     String role = payload['role'];
+  //
+  //     await storage.write(key: 'token', value: token);
+  //     await storage.write(key: 'sub', value: sub);
+  //     await storage.write(key: 'role', value: role);
+  //
+  //     print('Login successful. Sub: $sub, Role: $role');
+  //
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => Home()),
+  //     );
+  //   } else {
+  //     print('Login failed with status: ${response.statusCode}');
+  //     // Optionally show an error message
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

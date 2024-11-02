@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,7 +28,8 @@ public class Sales {
 
 
     @ManyToMany
-    private List<Product> product;
+//    private List<Product> product;
+    private List<Product> product = new ArrayList<>();
 
 
     @ManyToOne

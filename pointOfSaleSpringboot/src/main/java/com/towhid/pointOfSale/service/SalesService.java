@@ -9,6 +9,7 @@ import com.towhid.pointOfSale.repository.SalesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -53,6 +54,10 @@ public class SalesService {
 
     // General method to handle sales for any branch
     private Sales saveSalesForBranch(Sales sales, String branchName) {
+
+        if (sales.getProduct() == null) {
+            sales.setProduct(new ArrayList<>());  // Avoid NullPointerException by initializing
+        }
         Sales savedSales = salesRepository.save(sales);
 
         for (Product soldProduct : savedSales.getProduct()) {

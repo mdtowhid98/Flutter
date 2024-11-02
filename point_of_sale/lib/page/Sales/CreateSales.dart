@@ -20,7 +20,7 @@ class _CreateSalesPageState extends State<CreateSalesPage> {
   DateTime salesDate = DateTime.now();
   List<Product> products = [];
   List<Category> categories = [];
-  List<SaleProduct> saleProducts = [];
+
   int totalPrice = 0;
   bool isLoadingCategories = true;
   bool isLoadingProducts = true;
@@ -76,20 +76,25 @@ class _CreateSalesPageState extends State<CreateSalesPage> {
   }
 
   void calculateTotalPrice() {
-    totalPrice = saleProducts.fold(
-        0, (sum, item) => sum + (item.unitPrice * item.quantity));
+    totalPrice = products.fold(
+        0,
+            (sum, item) => sum + ((item.unitprice ?? 0) * (item.quantity ?? 0))
+    );
     setState(() {});
   }
 
+
+
   void addProduct() {
     setState(() {
-      saleProducts.add(SaleProduct());
+      products.add(Product()); // Add a new empty Product instance
     });
   }
 
+
   void removeProduct(int index) {
     setState(() {
-      saleProducts.removeAt(index);
+      products.removeAt(index);
       calculateTotalPrice();
     });
   }
@@ -97,10 +102,10 @@ class _CreateSalesPageState extends State<CreateSalesPage> {
   Future<void> createSales() async {
     if (_formKey.currentState!.validate()) {
       final saleData = {
-        'customerName': customerName,
-        'salesDate': salesDate.toIso8601String(),
-        'totalPrice': totalPrice,
-        'products': saleProducts.map((product) => product.toJson()).toList(),
+        'customername': customerName,
+        'salesdate': salesDate.toIso8601String(),
+        'totalprice': totalPrice,
+        'product': products.map((product) => product.toJson()).toList(),
       };
 
       try {
@@ -112,7 +117,7 @@ class _CreateSalesPageState extends State<CreateSalesPage> {
           body: json.encode(saleData),
         );
 
-        if (response.statusCode == 201) {
+        if (response.statusCode == 200 || response.statusCode == 201) {
           Navigator.pop(context);
         } else {
           print('Failed to create sales: ${response.body}');
@@ -150,25 +155,25 @@ class _CreateSalesPageState extends State<CreateSalesPage> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: saleProducts.length,
+                  itemCount: products.length,
                   itemBuilder: (context, index) {
                     return ProductForm(
                       categories: categories,
                       products: products,
-                      saleProduct: saleProducts[index],
+
                       onRemove: () => removeProduct(index),
                       onProductChange: (product) {
                         setState(() {
-                          saleProducts[index].product = product;
-                          saleProducts[index].unitPrice =
+                          products[index].name= product.name;
+                          products[index].unitprice =
                               product.unitprice ?? 0;
-                          saleProducts[index].stock = product.stock ?? 0;
+                          products[index].stock = product.stock ?? 0;
                         });
                         calculateTotalPrice();
                       },
                       onQuantityChange: (quantity) {
                         setState(() {
-                          saleProducts[index].quantity = quantity;
+                          products[index].quantity = quantity;
                         });
                         calculateTotalPrice();
                       },
@@ -195,7 +200,7 @@ class _CreateSalesPageState extends State<CreateSalesPage> {
 class ProductForm extends StatefulWidget {
   final List<Category> categories;
   final List<Product> products;
-  final SaleProduct saleProduct;
+
   final VoidCallback onRemove;
   final ValueChanged<Product> onProductChange;
   final ValueChanged<int> onQuantityChange;
@@ -203,7 +208,7 @@ class ProductForm extends StatefulWidget {
   ProductForm({
     required this.categories,
     required this.products,
-    required this.saleProduct,
+
     required this.onRemove,
     required this.onProductChange,
     required this.onQuantityChange,
@@ -293,16 +298,17 @@ class _ProductFormState extends State<ProductForm> {
                     : '0',
               ),
             ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Total Price'),
-              keyboardType: TextInputType.number,
-              readOnly: true,
-              controller: TextEditingController(
-                text: (selectedProduct != null && widget.saleProduct.quantity > 0)
-                    ? '${(selectedProduct!.unitprice! * widget.saleProduct.quantity).toStringAsFixed(2)}'
-                    : '0',
-              ),
-            ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Unit Price'),
+          keyboardType: TextInputType.number,
+          readOnly: true,
+          controller: TextEditingController(
+            text: selectedProduct != null
+                ? '${selectedProduct!.unitprice ?? 0}' // Fallback to 0 if unitprice is null
+                : '0',
+          ),
+        ),
+
             ElevatedButton(onPressed: widget.onRemove, child: Text('Remove')),
           ],
         ),
@@ -310,3 +316,5 @@ class _ProductFormState extends State<ProductForm> {
     );
   }
 }
+
+

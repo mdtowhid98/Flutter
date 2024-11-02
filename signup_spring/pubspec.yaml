@@ -41,6 +41,7 @@ dependencies:
   jwt_decode: ^0.3.1
   image_picker: ^1.1.2
   provider: ^6.1.2
+  shared_preferences: ^2.3.2
 
 
 dev_dependencies:

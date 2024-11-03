@@ -37,7 +37,7 @@ class _AllProductViewState extends State<AllProductView> {
                 // Navigate to CreateProduct page
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CreateProduct()),
+                  MaterialPageRoute(builder: (context) => AddProductPage()),
                 );
               },
               child: Text('Create Product'),

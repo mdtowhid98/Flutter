@@ -1,12 +1,18 @@
 
-import 'dart:io';
-
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 
 import 'package:point_of_sale/model/ProductModel.dart';
+import 'package:point_of_sale/service/AuthService.dart';
 
 class ProductService {
+
+  final Dio _dio = Dio();
+
+  final AuthService authService = AuthService();
+
   final String apiUrl = 'http://localhost:8087/api/product/';
 
   Future<List<Product>> fetchProducts() async {
@@ -19,29 +25,44 @@ class ProductService {
       throw Exception('Failed to load products');
     }
   }
-}
 
-class CreateProductService {
-  Future<Product> createProduct(Product product, File? image) async {
-    var request = http.MultipartRequest(
-      "POST",
-      Uri.parse("http://localhost:8087/api/product/save"),
-    );
 
-    request.fields['product'] = json.encode(product.toJson());
+
+  Future<Product?> createProduct(Product product, XFile? image) async {
+    final formData = FormData();
+
+    formData.fields.add(MapEntry('product', jsonEncode(product.toJson())));
 
     if (image != null) {
-      var file = await http.MultipartFile.fromPath('image', image.path);
-      request.files.add(file);
+      final bytes = await image.readAsBytes();
+      formData.files.add(MapEntry('image', MultipartFile.fromBytes(
+        bytes,
+        filename: image.name,
+      )));
     }
 
-    var response = await request.send();
+    final token = await authService.getToken();
+    final headers = {'Authorization': 'Bearer $token'};
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      final respStr = await response.stream.bytesToString();
-      return Product.fromJson(json.decode(respStr));
-    } else {
-      throw Exception('Failed to save product: ${response.reasonPhrase}');
+    try {
+      final response = await _dio.post(
+        '${apiUrl}save',
+        data: formData,
+        options: Options(headers: headers),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return Product.fromJson(data); // Parse response data to Hotel object
+      } else {
+        print('Error creating product: ${response.statusCode}');
+        return null;
+      }
+    } on DioError catch (e) {
+      print('Error creating product: ${e.message}');
+      return null;
     }
   }
+
 }
+

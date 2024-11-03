@@ -298,16 +298,18 @@ class _ProductFormState extends State<ProductForm> {
                     : '0',
               ),
             ),
-        TextFormField(
-          decoration: InputDecoration(labelText: 'Unit Price'),
-          keyboardType: TextInputType.number,
-          readOnly: true,
-          controller: TextEditingController(
-            text: selectedProduct != null
-                ? '${selectedProduct!.unitprice ?? 0}' // Fallback to 0 if unitprice is null
-                : '0',
-          ),
-        ),
+        // TextFormField(
+        //   decoration: InputDecoration(labelText: 'Unit Price'),
+        //   keyboardType: TextInputType.number,
+        //   readOnly: true,
+        //   controller: TextEditingController(
+        //     text: selectedProduct != null
+        //         ? '${selectedProduct!.unitprice ?? 0}' // Fallback to 0 if unitprice is null
+        //         : '0',
+        //   ),
+        // ),
+
+
 
             ElevatedButton(onPressed: widget.onRemove, child: Text('Remove')),
           ],

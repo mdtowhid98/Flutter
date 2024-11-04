@@ -33,7 +33,7 @@ public class ProductRestController {
     @PostMapping("/save")
     public ApiResponse saveProduct(
             @RequestPart(value = "product") Product product,
-            @RequestParam(value = "image", required = true) MultipartFile file
+            @RequestParam(value = "image", required = false) MultipartFile file
     ) throws IOException {
         ApiResponse apiResponse = productService.saveProduct(product, file);
         return apiResponse;

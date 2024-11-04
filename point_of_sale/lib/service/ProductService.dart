@@ -1,6 +1,6 @@
-
 import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 
@@ -8,11 +8,10 @@ import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/service/AuthService.dart';
 
 class ProductService {
-
   final Dio _dio = Dio();
-
   final AuthService authService = AuthService();
 
+  // Replace localhost with your machine's IP if needed
   final String apiUrl = 'http://localhost:8087/api/product/';
 
   Future<List<Product>> fetchProducts() async {
@@ -26,43 +25,42 @@ class ProductService {
     }
   }
 
+  Future<void> createProduct(Product product, XFile imageFile) async {
+    // Correctly await the token retrieval
+    final String? token = await authService.getToken();
 
-
-  Future<Product?> createProduct(Product product, XFile? image) async {
-    final formData = FormData();
-
-    formData.fields.add(MapEntry('product', jsonEncode(product.toJson())));
-
-    if (image != null) {
-      final bytes = await image.readAsBytes();
-      formData.files.add(MapEntry('image', MultipartFile.fromBytes(
-        bytes,
-        filename: image.name,
-      )));
-    }
-
-    final token = await authService.getToken();
-    final headers = {'Authorization': 'Bearer $token'};
+    final String url = 'https://your-api-endpoint.com/products'; // Update with your API endpoint
+    final formData = FormData.fromMap({
+      'name': product.name,
+      'unitprice': product.unitprice,
+      'stock': product.stock,
+      'manufactureDate': product.manufactureDate,
+      'expiryDate': product.expiryDate,
+      'photo': await MultipartFile.fromFile(imageFile.path), // Adjust this if needed
+      // Add any other required fields here
+    });
 
     try {
-      final response = await _dio.post(
-        '${apiUrl}save',
+      final response = await Dio().post(
+        url,
         data: formData,
-        options: Options(headers: headers),
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $token', // Use the retrieved token
+          },
+        ),
       );
 
-      if (response.statusCode == 200) {
-        final data = response.data as Map<String, dynamic>;
-        return Product.fromJson(data); // Parse response data to Hotel object
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Successfully created
+        print('Product created: ${response.data}');
       } else {
-        print('Error creating product: ${response.statusCode}');
-        return null;
+        print('Error creating product: ${response.statusCode} ${response.data}');
       }
-    } on DioError catch (e) {
-      print('Error creating product: ${e.message}');
-      return null;
+    } catch (e) {
+      print('Error creating product: $e');
     }
   }
 
-}
 
+}

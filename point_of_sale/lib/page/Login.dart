@@ -41,7 +41,7 @@ class _LoginState extends State<Login> {
       } else if (role == 'ADMIN') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AdminPage()),
+          MaterialPageRoute(builder: (context) => Home()),
         );
       } else if (role == 'USER') {
         Navigator.pushReplacement(
@@ -109,7 +109,7 @@ class _LoginState extends State<Login> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              color: Colors.red,
+              color: Colors.blueAccent,
               child: Padding(
                 padding: EdgeInsets.all(20.0),
                 child: Column(

@@ -1,6 +1,3 @@
-
-
-
 import 'package:point_of_sale/model/BranchModel.dart';
 import 'package:point_of_sale/model/CategoryModel.dart';
 import 'package:point_of_sale/model/SupplierModel.dart';

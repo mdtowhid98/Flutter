@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/model/Sale.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SalesService {
   final String baseUrl = "http://localhost:8087/api/sales/";
@@ -34,18 +34,63 @@ class SalesService {
   }
 
   // Create sales for Dhanmondi branch
-  Future<Sale> createSales(Sale sales) async {
+  // Future<Sale> createSales(Sale sales) async {
+  //   final response = await http.post(
+  //     Uri.parse('${baseUrl}dhanmondi'),
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode(sales.toJson()),
+  //   );
+  //   if (response.statusCode == 200 || response.statusCode==201) {
+  //     return Sale.fromJson(jsonDecode(response.body));
+  //   } else {
+  //     throw Exception('Failed to create sales for Dhanmondi branch');
+  //   }
+  // }
+
+  // createMarineMoneyReceipt(
+  //     Sale receipt, String? token) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   final String? token =
+  //       prefs.getString('token'); // Adjust key based on your implementation
+  //
+  //   final response = await http.post(
+  //     Uri.parse(baseUrl + "dhanmondi"),
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //       'Authorization': token != null ? 'Bearer $token' : '',
+  //       // Include token if available
+  //     },
+  //     body: json.encode(receipt.toJson()),
+  //   );
+  //
+  //   if (response.statusCode == 201) {
+  //     return Sale.fromJson(json.decode(response.body));
+  //   } else {
+  //     throw Exception(
+  //         'Failed to create marine bill: ${response.statusCode} ${response.body}');
+  //   }
+  // }
+
+  Future<http.Response> createSales(String customername, DateTime salesdate, int totalprice, int quantity,
+     Product product) async {
     final response = await http.post(
-      Uri.parse('${baseUrl}dhanmondi'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(sales.toJson()),
+      Uri.parse(baseUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'customername': customername,
+        'salesdate': salesdate,
+        'totalprice': totalprice,
+        'quantity': quantity,
+        'Product':product
+      }), // Adjusted to use lowercase keys
     );
-    if (response.statusCode == 201) {
-      return Sale.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to create sales for Dhanmondi branch');
-    }
+
+    return response;
   }
+
+
+
+
 
   // Create sales for Banani branch
   Future<Sale> createSalesBonaniBranch(Sale sales) async {
@@ -121,66 +166,46 @@ class SalesService {
     }
   }
 }
+class CreateSalesService {
+  final String apiUrl = 'http://localhost:8087/api/sales/dhanmondi';
 
+  Future<http.Response> createSales(String customerName,
+      DateTime salesDate,
+      int totalPrice,
+      int quantity,
+      List<Product> products) async {
+    // Convert product list to JSON
+    List<Map<String, dynamic>> productJson = products.map((product) =>
+        product.toJson()).toList();
 
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-// import 'package:point_of_sale/model/ProductModel.dart';
-// import 'package:point_of_sale/model/Sale.dart';
-//
-//
-// class SalesService {
-//   final String baseUrl = "http://localhost:8087/api/sales/";
-//
-//   Future<List<Sale>> getAllSales() async {
-//     final response = await http.get(Uri.parse(baseUrl));
-//     if (response.statusCode == 200) {
-//       final List<dynamic> data = jsonDecode(response.body);
-//       return data.map((item) => Sale.fromJson(item)).toList();
-//     } else {
-//       throw Exception('Failed to load sales');
-//     }
-//   }
-//
-//   Future<Sale> createSales(Sale sale) async {
-//     final response = await http.post(
-//       Uri.parse(baseUrl),
-//       headers: {"Content-Type": "application/json"},
-//       body: jsonEncode(sale.toJson()),
-//     );
-//     if (response.statusCode == 201) {
-//       return Sale.fromJson(jsonDecode(response.body));
-//     } else {
-//       throw Exception('Failed to create sale');
-//     }
-//   }
-//
-//   Future<void> deleteSales(int id) async {
-//     final response = await http.delete(Uri.parse('$baseUrl$id'));
-//     if (response.statusCode != 200) {
-//       throw Exception('Failed to delete sale with ID: $id');
-//     }
-//   }
-//
-//   Future<Product> updateProductStock(int productId, int quantity) async {
-//     final response = await http.patch(
-//       Uri.parse('$baseUrl/products/$productId/reduceStock'),
-//       headers: {"Content-Type": "application/json"},
-//       body: jsonEncode({'quantity': quantity}),
-//     );
-//     if (response.statusCode == 200) {
-//       return Product.fromJson(jsonDecode(response.body));
-//     } else {
-//       throw Exception('Failed to update product stock');
-//     }
-//   }
-//
-//   Future<Sale> getSalesById(int saleId) async {
-//     final response = await http.get(Uri.parse('$baseUrl$saleId'));
-//     if (response.statusCode == 200) {
-//       return Sale.fromJson(jsonDecode(response.body));
-//     } else {
-//       throw Exception('Failed to load sale with ID: $saleId');
-//     }
-//   }
-// }
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'customername': customerName,
+        'salesdate': salesDate.toIso8601String(),
+        'totalprice': totalPrice,
+        'quantity': quantity,
+        'products': productJson,
+      }),
+    );
+
+    return response;
+  }
+
+  Future<List<Product>> fetchProducts() async {
+    try {
+      final response = await http.get(Uri.parse('http://localhost:8087/api/product/'));
+
+      if (response.statusCode == 200) {
+        List jsonResponse = json.decode(response.body);
+        return jsonResponse.map((product) => Product.fromJson(product)).toList();
+      } else {
+        throw Exception('Failed to load products');
+      }
+    } catch (error) {
+      print('Error fetching products: $error');
+      return []; // Return an empty list on error
+    }
+  }
+}

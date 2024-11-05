@@ -1,129 +1,91 @@
+import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:point_of_sale/model/CategoryModel.dart';
-
-import 'dart:convert';
-
 import 'package:point_of_sale/model/ProductModel.dart';
-import 'package:point_of_sale/model/SaleProduct.dart';
+import 'package:point_of_sale/service/SalesService.dart';
 
+class CreateSales extends StatefulWidget {
+  const CreateSales({super.key});
 
-
-class CreateSalesPage extends StatefulWidget {
   @override
-  _CreateSalesPageState createState() => _CreateSalesPageState();
+  State<CreateSales> createState() => _CreateSalesState();
 }
 
-class _CreateSalesPageState extends State<CreateSalesPage> {
-  final _formKey = GlobalKey<FormState>();
-  String customerName = '';
-  DateTime salesDate = DateTime.now();
-  List<Product> products = [];
-  List<Category> categories = [];
+class _CreateSalesState extends State<CreateSales> {
+  final TextEditingController customerNameController = TextEditingController();
+  final TextEditingController totalPriceController = TextEditingController();
+  final TextEditingController quantityController = TextEditingController();
+  final TextEditingController unitPriceController = TextEditingController();
 
-  int totalPrice = 0;
-  bool isLoadingCategories = true;
-  bool isLoadingProducts = true;
+  DateTime? salesDate = DateTime.now(); // Set default to current date
+  List<Product> products = []; // List to hold products
+  Product? selectedProduct;
+
+  final _formKey = GlobalKey<FormState>();
+  final CreateSalesService salesService = CreateSalesService();
 
   @override
   void initState() {
     super.initState();
-    loadCategories();
-    loadProducts();
+    _fetchProducts(); // Fetch products when the widget initializes
+    quantityController.addListener(_updateTotalPrice); // Add listener to quantity field
   }
 
-  Future<void> loadCategories() async {
-    try {
-      final response =
-      await http.get(Uri.parse('http://localhost:8087/api/category/'));
-      if (response.statusCode == 200) {
-        setState(() {
-          categories = (json.decode(response.body) as List)
-              .map((data) => Category.fromJson(data))
-              .toList();
-          isLoadingCategories = false;
-        });
-      } else {
-        throw Exception('Failed to load categories: ${response.body}');
-      }
-    } catch (error) {
-      setState(() {
-        isLoadingCategories = false;
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error loading categories: $error')));
-      });
+  @override
+  void dispose() {
+    quantityController.removeListener(_updateTotalPrice); // Remove listener
+    quantityController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _fetchProducts() async {
+    products = await salesService.fetchProducts();
+    setState(() {}); // Refresh the UI after fetching products
+  }
+
+  void _updateTotalPrice() {
+    if (selectedProduct != null && quantityController.text.isNotEmpty) {
+      double unitPrice = (selectedProduct!.unitprice ?? 0).toDouble();
+      int quantity = int.tryParse(quantityController.text) ?? 0;
+      double totalPrice = unitPrice * quantity;
+      totalPriceController.text = totalPrice.toStringAsFixed(2); // Format to 2 decimal places
     }
   }
 
-  Future<void> loadProducts() async {
-    try {
-      final response =
-      await http.get(Uri.parse('http://localhost:8087/api/product/'));
-      if (response.statusCode == 200) {
+  void _onProductSelected(Product? product) {
+    setState(() {
+      selectedProduct = product;
+      unitPriceController.text = product?.unitprice?.toString() ?? ''; // Update unit price
+      _updateTotalPrice(); // Update total price when product changes
+    });
+  }
+
+  void _createSales() async {
+    if (_formKey.currentState!.validate() && salesDate != null) {
+      String customerName = customerNameController.text;
+      double totalPrice = double.parse(totalPriceController.text); // Parse as double
+      int quantity = int.parse(quantityController.text);
+      List<Product> selectedProducts = selectedProduct != null ? [selectedProduct!] : [];
+
+      final response = await salesService.createSales(
+        customerName,
+        salesDate!,
+        totalPrice as int,
+        quantity,
+        selectedProducts,
+      );
+
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        print('Sales created successfully!');
+        customerNameController.clear();
+        totalPriceController.clear();
+        quantityController.clear();
+        unitPriceController.clear(); // Clear unit price field
         setState(() {
-          products = (json.decode(response.body) as List)
-              .map((data) => Product.fromJson(data))
-              .toList();
-          isLoadingProducts = false;
+          salesDate = DateTime.now();
+          selectedProduct = null;
         });
       } else {
-        throw Exception('Failed to load products');
-      }
-    } catch (error) {
-      print(error);
-      setState(() => isLoadingProducts = false);
-    }
-  }
-
-  void calculateTotalPrice() {
-    totalPrice = products.fold(
-        0,
-            (sum, item) => sum + ((item.unitprice ?? 0) * (item.quantity ?? 0))
-    );
-    setState(() {});
-  }
-
-
-
-  void addProduct() {
-    setState(() {
-      products.add(Product()); // Add a new empty Product instance
-    });
-  }
-
-
-  void removeProduct(int index) {
-    setState(() {
-      products.removeAt(index);
-      calculateTotalPrice();
-    });
-  }
-
-  Future<void> createSales() async {
-    if (_formKey.currentState!.validate()) {
-      final saleData = {
-        'customername': customerName,
-        'salesdate': salesDate.toIso8601String(),
-        'totalprice': totalPrice,
-        'product': products.map((product) => product.toJson()).toList(),
-      };
-
-      try {
-        final response = await http.post(
-          Uri.parse('http://localhost:8087/api/sales/dhanmondi'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8'
-          },
-          body: json.encode(saleData),
-        );
-
-        if (response.statusCode == 200 || response.statusCode == 201) {
-          Navigator.pop(context);
-        } else {
-          print('Failed to create sales: ${response.body}');
-        }
-      } catch (error) {
-        print('Error creating sale: $error');
+        print('Sales creation failed with status: ${response.statusCode}');
       }
     }
   }
@@ -133,190 +95,117 @@ class _CreateSalesPageState extends State<CreateSalesPage> {
     return Scaffold(
       appBar: AppBar(title: Text('Create Sales')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Customer Name'),
-                validator: (value) =>
-                value!.isEmpty ? 'Customer name is required' : null,
-                onChanged: (value) => customerName = value,
-              ),
-              SizedBox(height: 10),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Sales Date'),
-                readOnly: true,
-                controller: TextEditingController(
-                    text: salesDate.toLocal().toString().split(' ')[0]),
-                validator: (value) =>
-                value!.isEmpty ? 'Sales date is required' : null,
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: products.length,
-                  itemBuilder: (context, index) {
-                    return ProductForm(
-                      categories: categories,
-                      products: products,
-
-                      onRemove: () => removeProduct(index),
-                      onProductChange: (product) {
-                        setState(() {
-                          products[index].name= product.name;
-                          products[index].unitprice =
-                              product.unitprice ?? 0;
-                          products[index].stock = product.stock ?? 0;
-                        });
-                        calculateTotalPrice();
-                      },
-                      onQuantityChange: (quantity) {
-                        setState(() {
-                          products[index].quantity = quantity;
-                        });
-                        calculateTotalPrice();
-                      },
-                    );
+        padding: EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextFormField(
+                  controller: customerNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Customer Name',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.person),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a Customer name';
+                    }
+                    return null;
                   },
                 ),
-              ),
-              ElevatedButton(onPressed: addProduct, child: Text('Add Product')),
-              SizedBox(height: 10),
-              Text('Total Price: \$${totalPrice.toStringAsFixed(2)}'),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: createSales,
-                child: Text('Create Sales'),
-              ),
-            ],
+                SizedBox(height: 20),
+                DateTimeFormField(
+                  initialValue: salesDate,
+                  decoration: const InputDecoration(
+                    labelText: 'Sales Date',
+                    border: OutlineInputBorder(),
+                  ),
+                  mode: DateTimeFieldPickerMode.date,
+                  onChanged: (DateTime? value) {
+                    setState(() {
+                      salesDate = value;
+                    });
+                  },
+                ),
+                SizedBox(height: 20),
+                DropdownButtonFormField<Product>(
+                  value: selectedProduct,
+                  onChanged: _onProductSelected,
+                  decoration: InputDecoration(
+                    labelText: 'Product',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.category_outlined),
+                  ),
+                  items: products.map<DropdownMenuItem<Product>>((Product product) {
+                    return DropdownMenuItem<Product>(
+                      value: product,
+                      child: Text(product.name ?? ''),
+                    );
+                  }).toList(),
+                  validator: (value) {
+                    if (value == null) {
+                      return 'Please select a product';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: unitPriceController,
+                  decoration: InputDecoration(
+                    labelText: 'Unit Price',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.attach_money),
+                  ),
+                  readOnly: true,
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: totalPriceController,
+                  decoration: InputDecoration(
+                    labelText: 'Total Price',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.price_check),
+                  ),
+                  keyboardType: TextInputType.number,
+                  readOnly: true,
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: quantityController,
+                  decoration: InputDecoration(
+                    labelText: 'Quantity',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.production_quantity_limits),
+                  ),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a quantity';
+                    }
+                    return null;
+                  },
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _createSales,
+                  child: Text(
+                    "Create Sales",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 }
-
-class ProductForm extends StatefulWidget {
-  final List<Category> categories;
-  final List<Product> products;
-
-  final VoidCallback onRemove;
-  final ValueChanged<Product> onProductChange;
-  final ValueChanged<int> onQuantityChange;
-
-  ProductForm({
-    required this.categories,
-    required this.products,
-
-    required this.onRemove,
-    required this.onProductChange,
-    required this.onQuantityChange,
-  });
-
-  @override
-  _ProductFormState createState() => _ProductFormState();
-}
-
-class _ProductFormState extends State<ProductForm> {
-  Category? selectedCategory;
-  Product? selectedProduct;
-
-  @override
-  Widget build(BuildContext context) {
-    List<Product> filteredProducts = selectedCategory != null
-        ? widget.products
-        .where((product) => product.category?.id == selectedCategory!.id)
-        .toList()
-        : [];
-
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            DropdownButtonFormField<Category>(
-              decoration: InputDecoration(labelText: 'Category'),
-              items: widget.categories.map((category) {
-                return DropdownMenuItem<Category>(
-                  value: category,
-                  child: Text(category.categoryname ?? 'Unknown Category'),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedCategory = value;
-                  selectedProduct = null; // Reset product when category changes
-                });
-              },
-              validator: (value) =>
-              value == null ? 'Please select a category' : null,
-            ),
-            DropdownButtonFormField<Product>(
-              decoration: InputDecoration(labelText: 'Product'),
-              items: widget.products.map((product) {
-                return DropdownMenuItem<Product>(
-                  value: product,
-                  child: Text(product.name ?? 'Unknown Product'),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedProduct = value;
-                  widget.onProductChange(value!);
-                });
-              },
-              validator: (value) =>
-              value == null ? 'Please select a Product' : null,
-            ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Quantity'),
-              keyboardType: TextInputType.number,
-              onChanged: (value) {
-                if (value.isNotEmpty) {
-                  int quantity = int.parse(value);
-                  widget.onQuantityChange(quantity);
-                }
-              },
-              validator: (value) {
-                if (value == null ||
-                    value.isEmpty ||
-                    int.tryParse(value) == null ||
-                    int.parse(value) <= 0) {
-                  return 'Please enter a valid quantity';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              decoration: InputDecoration(labelText: 'Unit Price'),
-              keyboardType: TextInputType.number,
-              readOnly: true,
-              controller: TextEditingController(
-                text: selectedProduct != null
-                    ? '${selectedProduct!.unitprice}'
-                    : '0',
-              ),
-            ),
-        // TextFormField(
-        //   decoration: InputDecoration(labelText: 'Unit Price'),
-        //   keyboardType: TextInputType.number,
-        //   readOnly: true,
-        //   controller: TextEditingController(
-        //     text: selectedProduct != null
-        //         ? '${selectedProduct!.unitprice ?? 0}' // Fallback to 0 if unitprice is null
-        //         : '0',
-        //   ),
-        // ),
-
-
-
-            ElevatedButton(onPressed: widget.onRemove, child: Text('Remove')),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-

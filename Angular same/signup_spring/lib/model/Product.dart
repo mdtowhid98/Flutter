@@ -1,9 +1,7 @@
 
-
-
-import 'package:point_of_sale/model/BranchModel.dart';
-import 'package:point_of_sale/model/CategoryModel.dart';
-import 'package:point_of_sale/model/SupplierModel.dart';
+import 'package:signup_spring/model/Branch.dart';
+import 'package:signup_spring/model/Category.dart';
+import 'package:signup_spring/model/Supplier.dart';
 
 class Product {
   int? id;

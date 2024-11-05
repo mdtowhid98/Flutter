@@ -66,7 +66,7 @@ class _ViewSalesDetailsScreenState extends State<ViewSalesDetailsScreen> {
                 // Navigate to the CreateSales screen
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CreateSalesPage()),
+                  MaterialPageRoute(builder: (context) => CreateSales()),
                 );
               },
               child: Text('Create Sales'),

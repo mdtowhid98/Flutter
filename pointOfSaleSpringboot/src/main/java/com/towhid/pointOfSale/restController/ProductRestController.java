@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/product")
@@ -133,5 +134,18 @@ public class ProductRestController {
         return ResponseEntity.ok(products);
     }
 
+
+//    @PostMapping("/{id}/reduceStock")
+//    public ResponseEntity<ApiResponse> reduceStock(
+//            @PathVariable int id,
+//            @RequestBody Map<String, Integer> request) {
+//        try {
+//            int quantity = request.get("quantity");
+//            productService.reduceStock(id, quantity);
+//            return ResponseEntity.ok(new ApiResponse(true, "Stock updated successfully"));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, e.getMessage()));
+//        }
+//    }
 
 }

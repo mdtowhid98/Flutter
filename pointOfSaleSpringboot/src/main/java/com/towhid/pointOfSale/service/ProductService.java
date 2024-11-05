@@ -188,4 +188,22 @@ public class ProductService {
         return filename;
     }
 
+
+    // In ProductService.java
+//    public void reduceStock(int productId, int quantity) throws IOException {
+//        Product product = findProductById(productId); // Find the product
+//        if (product != null) {
+//            int newStock = product.getStock() - quantity; // Reduce the stock
+//            if (newStock < 0) {
+//                throw new IllegalArgumentException("Insufficient stock available");
+//            }
+//            product.setStock(newStock); // Set the new stock
+//            // Save updated product back to the database
+//            saveProduct(product, null); // Assuming saveProduct method handles both create and update
+//        } else {
+//            throw new RuntimeException("Product not found");
+//        }
+//    }
+
+
 }

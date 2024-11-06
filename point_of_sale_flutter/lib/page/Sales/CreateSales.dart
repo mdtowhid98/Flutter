@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:date_field/date_field.dart';
+import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
-import 'package:point_of_sale/page/Sales/SalesDetails.dart';
 import 'package:point_of_sale/page/invoice/DhanmondiBranchInvoice.dart';
+import 'package:point_of_sale/service/ProductService.dart';
 import 'package:point_of_sale/service/SalesService.dart';
 
-class CreateSales extends StatefulWidget {
-  const CreateSales({super.key});
 
+class CreateSales extends StatefulWidget {
   @override
-  State<CreateSales> createState() => _CreateSalesState();
+  _CreateSalesState createState() => _CreateSalesState();
 }
 
 class _CreateSalesState extends State<CreateSales> {
@@ -24,12 +23,13 @@ class _CreateSalesState extends State<CreateSales> {
 
   final _formKey = GlobalKey<FormState>();
   final CreateSalesService salesService = CreateSalesService();
-  bool isLoading = true; // Add loading state
+  final ProductService productService = ProductService();
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _fetchProducts();
+    _getAllDhanmondiBranchProducts();
     quantityControllers.forEach((controller) {
       controller.addListener(_updateTotalPrice);
     });
@@ -44,11 +44,18 @@ class _CreateSalesState extends State<CreateSales> {
     super.dispose();
   }
 
-  Future<void> _fetchProducts() async {
-    products = await salesService.fetchProducts();
-    setState(() {
-      isLoading = false; // Set loading to false after data fetch
-    });
+  Future<void> _getAllDhanmondiBranchProducts() async {
+    try {
+      products = await productService.getAllDhanmondiBranchProducts();
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Error fetching Dhanmondi branch products: $e');
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _updateTotalPrice() {
@@ -79,8 +86,29 @@ class _CreateSalesState extends State<CreateSales> {
     });
   }
 
+  bool _validateQuantities() {
+    for (int i = 0; i < selectedProducts.length; i++) {
+      final selectedProduct = selectedProducts[i];
+      final quantityText = quantityControllers[i].text;
+      final quantity = int.tryParse(quantityText) ?? 0;
+
+      if (selectedProduct != null && (selectedProduct.stock ?? 0) < quantity) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Requested quantity for ${selectedProduct.name} exceeds available stock (${selectedProduct.stock ?? 0}).',
+            ),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return false;
+      }
+    }
+    return true;
+  }
+
   void _createSales() async {
-    if (_formKey.currentState!.validate() && salesDate != null) {
+    if (_formKey.currentState!.validate() && salesDate != null && _validateQuantities()) {
       String customerName = customerNameController.text;
       double totalPrice = double.parse(totalPriceController.text);
       List<Map<String, dynamic>> productsToSubmit = [];
@@ -113,21 +141,12 @@ class _CreateSalesState extends State<CreateSales> {
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => InvoicePage(sale: saleData),
-        //   ),
-        // );
-
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ViewSalesDetailsScreen(),
+            builder: (context) => InvoicePage(sale: saleData),
           ),
         );
-
-
 
         customerNameController.clear();
         totalPriceController.clear();
@@ -202,7 +221,7 @@ class _CreateSalesState extends State<CreateSales> {
                         items: products.map<DropdownMenuItem<Product>>((Product product) {
                           return DropdownMenuItem<Product>(
                             value: product,
-                            child: Text(product.name ?? ''), // Ensure name is displayed
+                            child: Text('${product.name} (Stock: ${product.stock})'),
                           );
                         }).toList(),
                         validator: (value) {
@@ -212,7 +231,6 @@ class _CreateSalesState extends State<CreateSales> {
                           return null;
                         },
                       ),
-
                       SizedBox(height: 10),
                       TextFormField(
                         controller: unitPriceControllers[index],
@@ -235,6 +253,14 @@ class _CreateSalesState extends State<CreateSales> {
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter a quantity';
+                          }
+                          final quantity = int.tryParse(value);
+                          if (quantity == null || quantity <= 0) {
+                            return 'Enter a valid quantity';
+                          }
+                          final selectedProduct = selectedProducts[index];
+                          if (selectedProduct != null && quantity > (selectedProduct.stock ?? 0)) {
+                            return 'Exceeds stock quantity';
                           }
                           return null;
                         },

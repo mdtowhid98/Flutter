@@ -168,8 +168,22 @@ class SalesService {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 class CreateSalesService {
   final String apiUrl = 'http://localhost:8087/api/sales/dhanmondi';
+
 
   Future<http.Response> createSales(String customerName,
       DateTime salesDate,
@@ -210,4 +224,25 @@ class CreateSalesService {
       return []; // Return an empty list on error
     }
   }
+
+  Future<Product> updateProductStock(int productId, int quantity) async {
+    final url = Uri.parse('$apiUrl/products/$productId/reduceStock');
+
+    final response = await http.patch(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'quantity': quantity,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return Product.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to update product stock');
+    }
+  }
+
 }

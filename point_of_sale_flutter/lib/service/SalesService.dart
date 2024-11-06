@@ -168,19 +168,17 @@ class SalesService {
 }
 
 
-
-
-
 class CreateSalesService {
   final String apiUrl = 'http://localhost:8087/api/sales/dhanmondi';
 
-  Future<http.Response> createSales(
-      String customerName,
+  Future<http.Response> createSales(String customerName,
       DateTime salesDate,
       int totalPrice,
       int quantity,
       List<Product> products) async {
-    List<Map<String, dynamic>> productJson = products.map((product) => product.toJson()).toList();
+    // Convert product list to JSON
+    List<Map<String, dynamic>> productJson = products.map((product) =>
+        product.toJson()).toList();
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -212,27 +210,4 @@ class CreateSalesService {
       return []; // Return an empty list on error
     }
   }
-
-  Future<void> updateProductStock(int productId, int quantity) async {
-    final url = 'http://localhost:8087/api/product/$productId/reduceStock';
-
-    try {
-      final response = await http.post(
-        Uri.parse(url),
-        body: {'quantity': quantity.toString()},
-        headers: {'Content-Type': 'application/json'}, // Adjust as needed
-      );
-
-      if (response.statusCode == 200) {
-        print("Stock updated successfully!");
-      } else {
-        throw Exception('Failed to update stock: ${response.statusCode}');
-      }
-    } catch (e) {
-      print("Error occurred while updating stock: $e");
-      throw e; // Optionally rethrow the error for further handling
-    }
-  }
-
-
 }

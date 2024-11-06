@@ -16,6 +16,8 @@ class SalesDetailsService {
     }
   }
 
+
+
   // Fetch grouped sales details
   Future<Map<int, List<SalesDetails>>> getGroupedSalesDetails() async {
     final response = await http.get(Uri.parse('${baseUrl}grouped'));

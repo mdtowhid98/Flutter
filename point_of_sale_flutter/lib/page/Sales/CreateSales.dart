@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:date_field/date_field.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
+import 'package:point_of_sale/page/Sales/SalesDetails.dart';
 import 'package:point_of_sale/page/invoice/DhanmondiBranchInvoice.dart';
 import 'package:point_of_sale/service/SalesService.dart';
 
@@ -20,10 +21,10 @@ class _CreateSalesState extends State<CreateSales> {
   List<Product?> selectedProducts = [null];
   List<TextEditingController> quantityControllers = [TextEditingController()];
   List<TextEditingController> unitPriceControllers = [TextEditingController()];
-  List<TextEditingController> stockControllers = [TextEditingController()]; // New controller list for stock
 
   final _formKey = GlobalKey<FormState>();
   final CreateSalesService salesService = CreateSalesService();
+  bool isLoading = true; // Add loading state
 
   @override
   void initState() {
@@ -45,7 +46,9 @@ class _CreateSalesState extends State<CreateSales> {
 
   Future<void> _fetchProducts() async {
     products = await salesService.fetchProducts();
-    setState(() {});
+    setState(() {
+      isLoading = false; // Set loading to false after data fetch
+    });
   }
 
   void _updateTotalPrice() {
@@ -64,7 +67,6 @@ class _CreateSalesState extends State<CreateSales> {
     setState(() {
       selectedProducts[index] = product;
       unitPriceControllers[index].text = product?.unitprice?.toString() ?? '';
-      stockControllers[index].text = product?.stock?.toString() ?? ''; // Set stock value
       _updateTotalPrice();
     });
   }
@@ -74,7 +76,6 @@ class _CreateSalesState extends State<CreateSales> {
       selectedProducts.add(null);
       quantityControllers.add(TextEditingController()..addListener(_updateTotalPrice));
       unitPriceControllers.add(TextEditingController());
-      stockControllers.add(TextEditingController()); // Add new stock controller
     });
   }
 
@@ -112,29 +113,21 @@ class _CreateSalesState extends State<CreateSales> {
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        print('Sales created successfully!');
-
-        // Decrement stock for each sold product
-        for (int i = 0; i < selectedProducts.length; i++) {
-          if (selectedProducts[i] != null) {
-            int soldQuantity = int.tryParse(quantityControllers[i].text) ?? 0;
-            // Ensure the product ID is not null before updating stock
-            int? productId = selectedProducts[i]!.id;
-            if (productId != null) {
-              // Update the product stock in your backend
-              await salesService.updateProductStock(productId, soldQuantity);
-            } else {
-              print('Product ID is null for product: ${selectedProducts[i]!.name}');
-            }
-          }
-        }
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => InvoicePage(sale: saleData),
+        //   ),
+        // );
 
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => InvoicePage(sale: saleData),
+            builder: (context) => ViewSalesDetailsScreen(),
           ),
         );
+
+
 
         customerNameController.clear();
         totalPriceController.clear();
@@ -146,7 +139,6 @@ class _CreateSalesState extends State<CreateSales> {
           selectedProducts = [null];
           quantityControllers = [TextEditingController()];
           unitPriceControllers = [TextEditingController()];
-          stockControllers = [TextEditingController()]; // Reset stock controllers
         });
       } else {
         print('Sales creation failed with status: ${response.statusCode}');
@@ -154,14 +146,15 @@ class _CreateSalesState extends State<CreateSales> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Create Sales')),
       body: Padding(
         padding: EdgeInsets.all(16),
-        child: SingleChildScrollView(
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
           child: Form(
             key: _formKey,
             child: Column(
@@ -209,7 +202,7 @@ class _CreateSalesState extends State<CreateSales> {
                         items: products.map<DropdownMenuItem<Product>>((Product product) {
                           return DropdownMenuItem<Product>(
                             value: product,
-                            child: Text(product.name ?? ''),
+                            child: Text(product.name ?? ''), // Ensure name is displayed
                           );
                         }).toList(),
                         validator: (value) {
@@ -219,62 +212,62 @@ class _CreateSalesState extends State<CreateSales> {
                           return null;
                         },
                       ),
+
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: unitPriceControllers[index],
+                        decoration: InputDecoration(
+                          labelText: 'Unit Price',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.attach_money),
+                        ),
+                        readOnly: true,
+                      ),
+                      SizedBox(height: 10),
                       TextFormField(
                         controller: quantityControllers[index],
                         decoration: InputDecoration(
                           labelText: 'Quantity',
                           border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.add_shopping_cart),
+                          prefixIcon: Icon(Icons.production_quantity_limits),
                         ),
                         keyboardType: TextInputType.number,
                         validator: (value) {
-                          if (value == null || int.tryParse(value) == null || int.parse(value) <= 0) {
-                            return 'Please enter a valid quantity';
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a quantity';
                           }
                           return null;
                         },
-                      ),
-                      TextFormField(
-                        controller: unitPriceControllers[index],
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Unit Price',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.price_change),
-                        ),
-                      ),
-                      TextFormField(
-                        controller: stockControllers[index],
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'Stock',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.store),
-                        ),
                       ),
                       SizedBox(height: 20),
                     ],
                   );
                 }),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _addProductField,
-                  child: Text('Add Another Product'),
-                ),
-                SizedBox(height: 20),
                 TextFormField(
                   controller: totalPriceController,
-                  readOnly: true,
                   decoration: InputDecoration(
                     labelText: 'Total Price',
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.monetization_on),
+                    prefixIcon: Icon(Icons.price_check),
                   ),
+                  readOnly: true,
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _addProductField,
+                  child: Text("Add Product"),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _createSales,
-                  child: Text('Create Sales'),
+                  child: Text(
+                    "Create Sales",
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ],
             ),
@@ -284,4 +277,3 @@ class _CreateSalesState extends State<CreateSales> {
     );
   }
 }
-

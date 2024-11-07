@@ -33,43 +33,7 @@ class SalesService {
     }
   }
 
-  // Create sales for Dhanmondi branch
-  // Future<Sale> createSales(Sale sales) async {
-  //   final response = await http.post(
-  //     Uri.parse('${baseUrl}dhanmondi'),
-  //     headers: {"Content-Type": "application/json"},
-  //     body: jsonEncode(sales.toJson()),
-  //   );
-  //   if (response.statusCode == 200 || response.statusCode==201) {
-  //     return Sale.fromJson(jsonDecode(response.body));
-  //   } else {
-  //     throw Exception('Failed to create sales for Dhanmondi branch');
-  //   }
-  // }
 
-  // createMarineMoneyReceipt(
-  //     Sale receipt, String? token) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final String? token =
-  //       prefs.getString('token'); // Adjust key based on your implementation
-  //
-  //   final response = await http.post(
-  //     Uri.parse(baseUrl + "dhanmondi"),
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //       'Authorization': token != null ? 'Bearer $token' : '',
-  //       // Include token if available
-  //     },
-  //     body: json.encode(receipt.toJson()),
-  //   );
-  //
-  //   if (response.statusCode == 201) {
-  //     return Sale.fromJson(json.decode(response.body));
-  //   } else {
-  //     throw Exception(
-  //         'Failed to create marine bill: ${response.statusCode} ${response.body}');
-  //   }
-  // }
 
   Future<http.Response> createSales(String customername, DateTime salesdate, int totalprice, int quantity,
      Product product) async {
@@ -226,7 +190,7 @@ class CreateSalesService {
   }
 
   Future<Product> updateProductStock(int productId, int quantity) async {
-    final url = Uri.parse('$apiUrl/products/$productId/reduceStock');
+    final url = Uri.parse('$apiUrl/products/$productId/reduceStock',);
 
     final response = await http.patch(
       url,

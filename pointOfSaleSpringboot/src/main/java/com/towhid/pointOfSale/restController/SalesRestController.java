@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/sales")
 @CrossOrigin(origins = "http://localhost:4200/")
@@ -13,6 +15,11 @@ public class SalesRestController {
 
     @Autowired
     private SalesService salesService;
+
+    @GetMapping("/")
+    public List<Sales> getAllSales(){
+        return salesService.getAllSales();
+    }
 
     // Create sales for "Dhanmondi" branch
     @PostMapping("/dhanmondi")

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:point_of_sale/page/Sales/AllSalesView.dart';
 import 'package:point_of_sale/page/Sales/SalesDetails.dart';
 
 import 'package:point_of_sale/page/branch/AllBranchView.dart';
@@ -196,6 +197,11 @@ class _HomeState extends State<Home> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => ViewSalesDetailsScreen()),
+                          );
+                        }else if (index == 5) {  // Navigate to Branch
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ViewSales()),
                           );
                         }
                       },

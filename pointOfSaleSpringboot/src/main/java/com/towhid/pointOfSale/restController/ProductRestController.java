@@ -148,4 +148,18 @@ public class ProductRestController {
 //        }
 //    }
 
+//    @PatchMapping("/{id}/reduceStock")
+//    public ResponseEntity<ApiResponse> reduceStock(
+//            @PathVariable int id,
+//            @RequestBody Map<String, Integer> request) {
+//        try {
+//            int quantity = request.get("quantity");
+//            productService.reduceStock(id, quantity);
+//            return ResponseEntity.ok(new ApiResponse(true, "Stock updated successfully"));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, e.getMessage()));
+//        }
+//    }
+
+
 }

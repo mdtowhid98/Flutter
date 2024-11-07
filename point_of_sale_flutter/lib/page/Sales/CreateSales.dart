@@ -1,6 +1,7 @@
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
+import 'package:point_of_sale/page/Sales/AllSalesView.dart';
 import 'package:point_of_sale/page/invoice/DhanmondiBranchInvoice.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 import 'package:point_of_sale/service/SalesService.dart';
@@ -147,6 +148,13 @@ class _CreateSalesState extends State<CreateSales> {
             builder: (context) => InvoicePage(sale: saleData),
           ),
         );
+
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => ViewSales(),
+        //   ),
+        // );
 
         customerNameController.clear();
         totalPriceController.clear();

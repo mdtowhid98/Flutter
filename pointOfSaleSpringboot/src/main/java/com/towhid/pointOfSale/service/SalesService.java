@@ -24,6 +24,11 @@ public class SalesService {
     @Autowired
     private SalesDetailsRepository salesDetailsRepository;
 
+    public List<Sales> getAllSales() {
+
+        return salesRepository.findAll();
+    }
+
     // Fetch products from "Dhanmondi" branch
     public List<Product> getDhanmondiBranchProducts() {
         return productRepository.findByBranch_BranchName("Dhanmondi");

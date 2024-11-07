@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -202,6 +203,27 @@ public class ProductService {
 //            saveProduct(product, null); // Assuming saveProduct method handles both create and update
 //        } else {
 //            throw new RuntimeException("Product not found");
+//        }
+//    }
+
+//    public void reduceStock(int productId, int quantity) throws Exception {
+//        // Fetch the product by ID
+//        Optional<Product> productOptional = productRepository.findById(productId);
+//
+//        if (productOptional.isPresent()) {
+//            Product product = productOptional.get();
+//
+//            // Check if the stock is sufficient
+//            if (product.getStock() >= quantity) {
+//                // Reduce the stock
+//                product.setStock(product.getStock() - quantity);
+//                // Save the updated product back to the database
+//                productRepository.save(product);
+//            } else {
+//                throw new Exception("Insufficient stock available");
+//            }
+//        } else {
+//            throw new Exception("Product not found");
 //        }
 //    }
 

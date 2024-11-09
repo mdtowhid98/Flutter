@@ -1,7 +1,5 @@
 
-import 'dart:typed_data';
-
-import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
@@ -9,9 +7,9 @@ import 'dart:convert';
 import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/service/AuthService.dart';
 
-import 'package:http_parser/http_parser.dart';
-
 class ProductService {
+
+  final Dio _dio = Dio();
 
   final AuthService authService = AuthService();
 
@@ -30,53 +28,38 @@ class ProductService {
 
 
 
-  Future<Product?> createProduct(Product product, XFile? image, Uint8List? imageData) async {
-    var uri = Uri.parse(apiUrl);
-    var request = http.MultipartRequest('POST', uri);
+  Future<Product?> createProduct(Product product, XFile? image) async {
+    final formData = FormData();
 
-    request.files.add(
-      http.MultipartFile.fromString(
-        'product',
-        jsonEncode(product),
-        contentType: MediaType('application', 'json'),
-      ),
-    );
+    formData.fields.add(MapEntry('product', jsonEncode(product.toJson())));
 
     if (image != null) {
-      request.files.add(
-        await http.MultipartFile.fromPath('image', image!.path),
-      );
-    }
-
-    if (kIsWeb && imageData != null) {
-      request.files.add(http.MultipartFile.fromBytes(
-        'image',
-        imageData!,
-        filename: 'upload.jpg',
-        contentType: MediaType('image', 'jpeg'),
-      ));
-    } else if (image != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'image',
-        image!.path,
-      ));
+      final bytes = await image.readAsBytes();
+      formData.files.add(MapEntry('image', MultipartFile.fromBytes(
+        bytes,
+        filename: image.name,
+      )));
     }
 
     final token = await authService.getToken();
-    request.headers['Authorization'] = 'Bearer $token';
+    final headers = {'Authorization': 'Bearer $token'};
 
     try {
-      final response = await request.send();
-      final responseBody = await http.Response.fromStream(response);
+      final response = await _dio.post(
+        '${apiUrl}save',
+        data: formData,
+        options: Options(headers: headers),
+      );
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(responseBody.body) as Map<String, dynamic>;
-        return Product.fromJson(data);
+        final data = response.data as Map<String, dynamic>;
+        return Product.fromJson(data); // Parse response data to Hotel object
       } else {
         print('Error creating product: ${response.statusCode}');
         return null;
       }
-    } catch (e) {
-      print('Error creating product: ${e.toString()}');
+    } on DioError catch (e) {
+      print('Error creating product: ${e.message}');
       return null;
     }
   }

@@ -10,7 +10,7 @@ class Product {
   String? name;
   String? photo;
   int? stock;
-  // int? quantity;
+  int? quantity;
   int? unitprice;
   String? manufactureDate;
   String? expiryDate;
@@ -23,7 +23,7 @@ class Product {
         this.name,
         this.photo,
         this.stock,
-        // this.quantity,
+        this.quantity,
         this.unitprice,
         this.manufactureDate,
         this.expiryDate,
@@ -36,7 +36,7 @@ class Product {
     name = json['name'];
     photo = json['photo'];
     stock = json['stock'];
-    // quantity = json['quantity'];
+    quantity = json['quantity'];
     unitprice = json['unitprice'];
     manufactureDate = json['manufactureDate'];
     expiryDate = json['expiryDate'];
@@ -56,7 +56,7 @@ class Product {
     data['name'] = this.name;
     data['photo'] = this.photo;
     data['stock'] = this.stock;
-    // data['quantity'] = this.quantity;
+    data['quantity'] = this.quantity;
     data['unitprice'] = this.unitprice;
     data['manufactureDate'] = this.manufactureDate;
     data['expiryDate'] = this.expiryDate;

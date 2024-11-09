@@ -1,0 +1,55 @@
+Future<void> submitRawMaterial() async {
+    if (nameTEC.text.isEmpty) {
+      NotifyUtil.error(context, 'Please enter name.');
+      return;
+    }
+    _rawMaterial.name = nameTEC.text;
+    if (_rawMaterial.unit == null) {
+      NotifyUtil.error(context, 'Please select unit.');
+      return;
+    }
+    if (_rawMaterial.category == null) {
+      NotifyUtil.error(context, 'Please select a category before saving.');
+      return;
+    }
+
+    var uri = Uri.parse('http://localhost:8080/api/rawmaterial/save');
+    var request = http.MultipartRequest('POST', uri);
+
+    request.files.add(
+      http.MultipartFile.fromString(
+        'rawMaterial',
+        jsonEncode(_rawMaterial),
+        contentType: MediaType('application', 'json'),
+      ),
+    );
+
+    if (kIsWeb && webImage != null) {
+      request.files.add(http.MultipartFile.fromBytes(
+        'imageFile',
+        webImage!,
+        filename: 'upload.jpg',
+        contentType: MediaType('image', 'jpeg'),
+      ));
+    } else if (selectedImage != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'imageFile',
+        selectedImage!.path,
+      ));
+    }
+
+    await _sendRequest(request);
+  }    Future<void> _loadCategories() async {
+    final response =
+    await RawMaterialCategoryService().getAllRawMaterialCategories();
+    if (response.success) {
+      setState(() {
+        _categories = (response.data?['categories'] as List)
+            .map((json) => RawMatCategory.fromJson(json))
+            .toList();
+      });
+    } else {
+      NotifyUtil.error(
+          context, response.message ?? 'Failed to load categories');
+    }
+  }

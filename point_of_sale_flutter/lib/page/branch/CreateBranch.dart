@@ -96,15 +96,17 @@ class _CreateBranchState extends State<CreateBranch> {
                   controller: branchNameController,
                   decoration: InputDecoration(
                     labelText: 'Branch Name',
+                    labelStyle: TextStyle(fontSize: 14), // Smaller label text
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20), // Rounded corners
                     ),
-                    prefixIcon: Icon(Icons.home_filled),
+                    prefixIcon: Icon(Icons.home_filled, size: 20), // Smaller icon
                     contentPadding: EdgeInsets.symmetric(
-                      vertical: 10, // Adjust height
-                      horizontal: 12,
+                      vertical: 8, // Reduced height
+                      horizontal: 10, // Reduced horizontal padding
                     ),
                   ),
+                  style: TextStyle(fontSize: 14), // Smaller input text
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a Branch name';
@@ -117,15 +119,17 @@ class _CreateBranchState extends State<CreateBranch> {
                   controller: branchLocationController,
                   decoration: InputDecoration(
                     labelText: 'Location',
+                    labelStyle: TextStyle(fontSize: 14), // Smaller label text
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20), // Rounded corners
                     ),
-                    prefixIcon: Icon(Icons.location_city),
+                    prefixIcon: Icon(Icons.location_city, size: 20), // Smaller icon
                     contentPadding: EdgeInsets.symmetric(
-                      vertical: 10, // Adjust height
-                      horizontal: 12,
+                      vertical: 8, // Reduced height
+                      horizontal: 10, // Reduced horizontal padding
                     ),
                   ),
+                  style: TextStyle(fontSize: 14), // Smaller input text
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a Branch Location';

@@ -92,5 +92,22 @@ class ProductService {
     }
   }
 
+
+  Future<void> updateProduct(int id, Product product) async {
+    final response = await http.put(
+      Uri.parse('http://localhost:8087/api/product/update/$id'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(product.toJson()),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to update supplier');
+    }
+  }
+
+
+
 }
 

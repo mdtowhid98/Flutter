@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/page/product/CreateProduct.dart';
+import 'package:point_of_sale/page/product/UpdateProduct.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 
-
-class AllProductView extends StatefulWidget {
+class AllProductView extends StatefulWidget with WidgetsBindingObserver {
   const AllProductView({super.key});
 
   @override
@@ -19,6 +19,24 @@ class _AllProductViewState extends State<AllProductView> {
     super.initState();
     futureProducts = ProductService().fetchProducts();
   }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      futureProducts = ProductService().fetchProducts();
+    }
+  }
+
+  // void _updateProduct(Product product) {
+  //   Navigator.push(
+  //     context,
+  //     MaterialPageRoute(builder: (context) => UpdateProductView(product: product)),
+  //   ).then((_) {
+  //     setState(() {
+  //       futureProducts = ProductService().fetchProducts();
+  //     });
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +88,7 @@ class _AllProductViewState extends State<AllProductView> {
                         ),
                         child: Container(
                           width: double.infinity,
-                          height: 200,
+                          height: 220,
                           padding: const EdgeInsets.all(10),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,6 +192,15 @@ class _AllProductViewState extends State<AllProductView> {
                                     ),
                                   ],
                                 ),
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  // IconButton(
+                                  //   icon: Icon(Icons.edit, color: Colors.blue),
+                                  //   onPressed: () => _updateProduct(product),
+                                  // ),
+                                ],
                               ),
                             ],
                           ),

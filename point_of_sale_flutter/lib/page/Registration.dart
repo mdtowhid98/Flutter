@@ -95,7 +95,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                color: Colors.red,
+                color: Colors.lightBlue,
                 child: Padding(
                   padding: EdgeInsets.all(16),
                   child: Form(

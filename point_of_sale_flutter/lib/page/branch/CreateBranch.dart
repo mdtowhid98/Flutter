@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:point_of_sale/page/branch/AllBranchView.dart';
 import 'package:point_of_sale/service/BranchService.dart';
 
-
 class CreateBranch extends StatefulWidget {
   const CreateBranch({super.key});
 
@@ -13,7 +12,6 @@ class CreateBranch extends StatefulWidget {
 class _CreateBranchState extends State<CreateBranch> {
   final TextEditingController branchNameController = TextEditingController();
   final TextEditingController branchLocationController = TextEditingController();
-
   final _formKey = GlobalKey<FormState>();
   final CreateBranchService branchService = CreateBranchService();
 
@@ -31,7 +29,6 @@ class _CreateBranchState extends State<CreateBranch> {
 
       try {
         final response = await branchService.createBranch(bName, blocation);
-
         Navigator.pop(context); // Close loading indicator
 
         if (response.statusCode == 201 || response.statusCode == 200) {
@@ -67,7 +64,26 @@ class _CreateBranchState extends State<CreateBranch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create Branch')),
+      appBar: AppBar(
+        title: Text('Create Branch'),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Colors.lightBlueAccent,
+                Colors.lime,
+                Colors.deepPurpleAccent,
+                Colors.lightGreenAccent,
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -80,8 +96,14 @@ class _CreateBranchState extends State<CreateBranch> {
                   controller: branchNameController,
                   decoration: InputDecoration(
                     labelText: 'Branch Name',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20), // Rounded corners
+                    ),
                     prefixIcon: Icon(Icons.home_filled),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 10, // Adjust height
+                      horizontal: 12,
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -95,8 +117,14 @@ class _CreateBranchState extends State<CreateBranch> {
                   controller: branchLocationController,
                   decoration: InputDecoration(
                     labelText: 'Location',
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20), // Rounded corners
+                    ),
                     prefixIcon: Icon(Icons.location_city),
+                    contentPadding: EdgeInsets.symmetric(
+                      vertical: 10, // Adjust height
+                      horizontal: 12,
+                    ),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {

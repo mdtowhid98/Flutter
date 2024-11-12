@@ -108,7 +108,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
       try {
         // Assuming createProduct accepts an XFile; adjust as needed based on your service method
-        await ProductService().createProduct(product, _imageFile!, _imageData);
+        await ProductService().createProduct(product, _imageFile, _imageData);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Product added successfully!')),
         );
@@ -266,7 +266,7 @@ class _AddProductPageState extends State<AddProductPage> {
               SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _saveProduct,
-                child: Text('Save Hotel'),
+                child: Text('Save Product'),
               ),
             ],
           ),

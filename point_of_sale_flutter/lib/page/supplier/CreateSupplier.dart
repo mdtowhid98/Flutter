@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:point_of_sale/page/supplier/AllSupplierView.dart';
 import 'package:point_of_sale/service/SupplierService.dart';
 
-
 class CreateSupplier extends StatefulWidget {
   const CreateSupplier({super.key});
 
@@ -23,7 +22,7 @@ class _CreateSupplierState extends State<CreateSupplier> {
     if (_formKey.currentState!.validate()) {
       String sName = supplierName.text;
       String sEmail = supplierEmail.text;
-      int sCell = int.parse(supplierCell.text); // Kept as string
+      int sCell = int.parse(supplierCell.text);
       String sAddress = supplierAddress.text;
 
       final response = await supplierService.createSupplier(sName, sEmail, sCell, sAddress);
@@ -36,7 +35,7 @@ class _CreateSupplierState extends State<CreateSupplier> {
         supplierAddress.clear();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AllSupplierView()),
+          MaterialPageRoute(builder: (context) => SupplierListView()),
         );
       } else if (response.statusCode == 409) {
         print('Supplier already exists!');
@@ -49,7 +48,20 @@ class _CreateSupplierState extends State<CreateSupplier> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create Supplier')),
+      appBar: AppBar(
+        title: Text('Create Supplier'),
+        centerTitle: true, // This centers the title
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.lime, Colors.lightGreenAccent, Colors.yellowAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+
+            ),
+          ),
+        ),
+      ),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: SingleChildScrollView(
@@ -58,81 +70,61 @@ class _CreateSupplierState extends State<CreateSupplier> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                TextFormField(
-                  controller: supplierName,
-                  decoration: InputDecoration(
-                    labelText: 'Supplier Name',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.support_rounded),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a supplier name';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: supplierEmail,
-                  decoration: InputDecoration(
-                    labelText: 'Supplier Email',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a supplier email';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: supplierCell,
-                  decoration: InputDecoration(
-                    labelText: 'Cell No',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.phone),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a phone number';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
-                TextFormField(
-                  controller: supplierAddress,
-                  decoration: InputDecoration(
-                    labelText: 'Address',
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.location_city),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter an address';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 20),
+                _buildRoundedTextField(supplierName, 'Supplier Name', Icons.support_rounded),
+                SizedBox(height: 8),
+                _buildRoundedTextField(supplierEmail, 'Supplier Email', Icons.email),
+                SizedBox(height: 8),
+                _buildRoundedTextField(supplierCell, 'Cell No', Icons.phone),
+                SizedBox(height: 8),
+                _buildRoundedTextField(supplierAddress, 'Address', Icons.location_city),
+                SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _createSupplier,
                   child: Text(
-                    "Create Supplier", // Updated button text
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    "Create Supplier",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent,
                     foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                   ),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  // Reusable method to create a smaller, rounded TextField
+  Widget _buildRoundedTextField(TextEditingController controller, String label, IconData icon) {
+    return Container(
+      width: double.infinity,
+      child: TextFormField(
+        controller: controller,
+        style: TextStyle(fontSize: 12), // Smaller font size
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12), // Smaller padding for compact height
+          labelText: label,
+          labelStyle: TextStyle(fontSize: 12), // Smaller label font
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20), // Rounded corners
+            borderSide: BorderSide(color: Colors.blueAccent),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20),
+            borderSide: BorderSide(color: Colors.blueAccent, width: 2),
+          ),
+          prefixIcon: Icon(icon, color: Colors.blueAccent, size: 18), // Smaller icon
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter $label';
+          }
+          return null;
+        },
       ),
     );
   }

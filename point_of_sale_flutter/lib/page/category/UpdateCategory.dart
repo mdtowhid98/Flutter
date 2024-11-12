@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/CategoryModel.dart';
 import 'package:point_of_sale/service/CategoryService.dart';
 
-
-
-
 class UpdateCategoryView extends StatefulWidget {
   final Category category;
 
@@ -40,32 +37,78 @@ class _UpdateCategoryViewState extends State<UpdateCategoryView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Update Category')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                initialValue: categoryName,
-                decoration: InputDecoration(labelText: 'Category Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a category name';
-                  }
-                  return null;
-                },
-                onChanged: (value) {
-                  categoryName = value;
-                },
+      appBar: AppBar(
+        title: Text('Update Category'),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange, Colors.lightGreenAccent, Colors.yellowAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextFormField(
+                    initialValue: categoryName,
+                    decoration: InputDecoration(
+                      labelText: 'Category Name',
+                      labelStyle: TextStyle(color: Colors.blueAccent, fontSize: 14),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(color: Colors.blueAccent, width: 1),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: BorderSide(color: Colors.blueAccent, width: 2),
+                      ),
+                      prefixIcon: Icon(Icons.category, color: Colors.blueAccent, size: 20),
+                      contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      isDense: true,
+                    ),
+                    style: TextStyle(fontSize: 14),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a category name';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      categoryName = value;
+                    },
+                    textAlignVertical: TextAlignVertical.center,
+                  ),
+                  SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _updateCategory,
+                    child: Text(
+                      "Update Category",
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 12, horizontal: 30),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 5,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _updateCategory,
-                child: Text('Update Category'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

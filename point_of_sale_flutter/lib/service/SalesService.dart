@@ -35,114 +35,101 @@ class SalesService {
 
 
 
-  Future<http.Response> createSales(String customername, DateTime salesdate, int totalprice, int quantity,
-     Product product) async {
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        'customername': customername,
-        'salesdate': salesdate,
-        'totalprice': totalprice,
-        'quantity': quantity,
-        'Product':product
-      }), // Adjusted to use lowercase keys
-    );
-
-    return response;
-  }
+  // Future<http.Response> createSales(String customername, DateTime salesdate, int totalprice, int quantity,
+  //    Product product) async {
+  //   final response = await http.post(
+  //     Uri.parse(baseUrl),
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: json.encode({
+  //       'customername': customername,
+  //       'salesdate': salesdate,
+  //       'totalprice': totalprice,
+  //       'quantity': quantity,
+  //       'Product':product
+  //     }), // Adjusted to use lowercase keys
+  //   );
+  //
+  //   return response;
+  // }
 
 
 
 
 
   // Create sales for Banani branch
-  Future<Sale> createSalesBonaniBranch(Sale sales) async {
-    final response = await http.post(
-      Uri.parse('${baseUrl}banani'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(sales.toJson()),
-    );
-    if (response.statusCode == 201) {
-      return Sale.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to create sales for Banani branch');
-    }
-  }
+  // Future<Sale> createSalesBonaniBranch(Sale sales) async {
+  //   final response = await http.post(
+  //     Uri.parse('${baseUrl}banani'),
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode(sales.toJson()),
+  //   );
+  //   if (response.statusCode == 201) {
+  //     return Sale.fromJson(jsonDecode(response.body));
+  //   } else {
+  //     throw Exception('Failed to create sales for Banani branch');
+  //   }
+  // }
 
   // Create sales for Gulshan branch
-  Future<Sale> createSalesGulshanBranch(Sale sales) async {
-    final response = await http.post(
-      Uri.parse('${baseUrl}gulshan'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(sales.toJson()),
-    );
-    if (response.statusCode == 201) {
-      return Sale.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to create sales for Gulshan branch');
-    }
-  }
+  // Future<Sale> createSalesGulshanBranch(Sale sales) async {
+  //   final response = await http.post(
+  //     Uri.parse('${baseUrl}gulshan'),
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode(sales.toJson()),
+  //   );
+  //   if (response.statusCode == 201) {
+  //     return Sale.fromJson(jsonDecode(response.body));
+  //   } else {
+  //     throw Exception('Failed to create sales for Gulshan branch');
+  //   }
+  // }
 
   // Delete a sale by ID
-  Future<void> deleteSales(int id) async {
-    final response = await http.delete(Uri.parse('${baseUrl}delete/$id'));
-    if (response.statusCode != 200) {
-      throw Exception('Failed to delete sale with ID: $id');
-    }
-  }
+  // Future<void> deleteSales(int id) async {
+  //   final response = await http.delete(Uri.parse('${baseUrl}delete/$id'));
+  //   if (response.statusCode != 200) {
+  //     throw Exception('Failed to delete sale with ID: $id');
+  //   }
+  // }
 
   // Update product stock
-  Future<Product> updateProductStock(int productId, int quantity) async {
-    final response = await http.patch(
-      Uri.parse('${baseUrl}/products/$productId/reduceStock'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({'quantity': quantity}),
-    );
-    if (response.statusCode == 200) {
-      return Product.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to update product stock');
-    }
-  }
+  // Future<Product> updateProductStock(int productId, int quantity) async {
+  //   final response = await http.patch(
+  //     Uri.parse('${baseUrl}/products/$productId/reduceStock'),
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode({'quantity': quantity}),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     return Product.fromJson(jsonDecode(response.body));
+  //   } else {
+  //     throw Exception('Failed to update product stock');
+  //   }
+  // }
 
   // Update a sale by ID
-  Future<Sale> updateSales(int id, Sale sale) async {
-    final response = await http.put(
-      Uri.parse('${baseUrl}$id'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(sale.toJson()),
-    );
-    if (response.statusCode == 200) {
-      return Sale.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to update sale with ID: $id');
-    }
-  }
+  // Future<Sale> updateSales(int id, Sale sale) async {
+  //   final response = await http.put(
+  //     Uri.parse('${baseUrl}$id'),
+  //     headers: {"Content-Type": "application/json"},
+  //     body: jsonEncode(sale.toJson()),
+  //   );
+  //   if (response.statusCode == 200) {
+  //     return Sale.fromJson(jsonDecode(response.body));
+  //   } else {
+  //     throw Exception('Failed to update sale with ID: $id');
+  //   }
+  // }
 
   // Get a sale by ID
-  Future<Sale> getSalesById(int saleId) async {
-    final response = await http.get(Uri.parse('${baseUrl}$saleId'));
-    if (response.statusCode == 200) {
-      return Sale.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load sale with ID: $saleId');
-    }
-  }
+  // Future<Sale> getSalesById(int saleId) async {
+  //   final response = await http.get(Uri.parse('${baseUrl}$saleId'));
+  //   if (response.statusCode == 200) {
+  //     return Sale.fromJson(jsonDecode(response.body));
+  //   } else {
+  //     throw Exception('Failed to load sale with ID: $saleId');
+  //   }
+  // }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 class CreateSalesService {

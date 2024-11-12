@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/BranchModel.dart';
-import 'package:point_of_sale/page/branch/CreateBranch.dart'; // Import CreateBranch page
+import 'package:point_of_sale/page/branch/CreateBranch.dart';
 import 'package:point_of_sale/page/branch/UpdateBranch.dart';
 import 'package:point_of_sale/service/BranchService.dart';
 
@@ -13,6 +13,14 @@ class AllBranchesView extends StatefulWidget {
 
 class _AllBranchesViewState extends State<AllBranchesView> {
   late Future<List<Branch>> futureBranches;
+
+  final List<Color> borderColors = [
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+  ];
 
   @override
   void initState() {
@@ -44,35 +52,20 @@ class _AllBranchesViewState extends State<AllBranchesView> {
       appBar: AppBar(
         title: Text('Branches'),
         centerTitle: true,
-        backgroundColor: Colors.teal,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.yellowAccent, Colors.green, Colors.lightGreenAccent, Colors.teal],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
       body: Column(
         children: [
-          // Add ElevatedButton at the top
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CreateBranch()),
-                    ).then((_) {
-                      setState(() {
-                        futureBranches = BranchService().fetchBranches();
-                      });
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.lightGreenAccent, // Button color
-                  ),
-                  child: Text('Create Branch'),
-                ),
-              ],
-            ),
-          ),
           Expanded(
             child: FutureBuilder<List<Branch>>(
               future: futureBranches,
@@ -88,33 +81,43 @@ class _AllBranchesViewState extends State<AllBranchesView> {
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       final branch = snapshot.data![index];
+                      final borderColor = borderColors[index % borderColors.length];
+
                       return Card(
                         margin: EdgeInsets.all(10),
                         elevation: 4,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
+                          side: BorderSide(color: borderColor, width: 2), // Set the border color
                         ),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          child: Row(
                             children: [
-                              Text(
-                                'ID: ${branch.id ?? 'Unnamed ID'}',
-                                style: TextStyle(fontWeight: FontWeight.bold),
+                              // Expanded column for branch details
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'ID: ${branch.id ?? 'Unnamed ID'}',
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'Branch Name: ${branch.branchName ?? 'No branch available'}',
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                    Text(
+                                      'Location: ${branch.location ?? 'No location available'}',
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              SizedBox(height: 4),
-                              Text(
-                                'Branch Name: ${branch.branchName ?? 'No branch available'}',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                              Text(
-                                'Location: ${branch.location ?? 'No location available'}',
-                                style: TextStyle(color: Colors.grey[600]),
-                              ),
-                              SizedBox(height: 8),
+                              // Row for action buttons
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   IconButton(
                                     icon: Icon(Icons.edit),
@@ -138,7 +141,7 @@ class _AllBranchesViewState extends State<AllBranchesView> {
                                               ),
                                               TextButton(
                                                 onPressed: () {
-                                                  _deleteBranch(branch); // Fixed the call here
+                                                  _deleteBranch(branch);
                                                   Navigator.of(context).pop();
                                                 },
                                                 child: Text('Delete'),
@@ -162,6 +165,20 @@ class _AllBranchesViewState extends State<AllBranchesView> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => CreateBranch()),
+          ).then((_) {
+            setState(() {
+              futureBranches = BranchService().fetchBranches();
+            });
+          });
+        },
+        backgroundColor: Colors.lightGreenAccent,
+        child: Icon(Icons.add, color: Colors.white),
       ),
     );
   }

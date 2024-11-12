@@ -31,7 +31,7 @@ class ProductService {
 
 
   Future<Product?> createProduct(Product product, XFile? image, Uint8List? imageData) async {
-    var uri = Uri.parse(apiUrl);
+    var uri = Uri.parse(apiUrl + 'save');
     var request = http.MultipartRequest('POST', uri);
 
     request.files.add(

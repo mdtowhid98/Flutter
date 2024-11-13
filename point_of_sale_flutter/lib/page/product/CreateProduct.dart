@@ -1,10 +1,10 @@
-import 'dart:typed_data';
-
-import 'package:date_field/date_field.dart';
-import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as foundation;
+import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:date_field/date_field.dart';
+import 'AllProductView.dart';
 import 'package:point_of_sale/model/BranchModel.dart';
 import 'package:point_of_sale/model/CategoryModel.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
@@ -13,7 +13,6 @@ import 'package:point_of_sale/service/BranchService.dart';
 import 'package:point_of_sale/service/CategoryService.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 import 'package:point_of_sale/service/SupplierService.dart';
-import 'AllProductView.dart'; // Import the AllProductView page
 
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
@@ -52,8 +51,7 @@ class _AddProductPageState extends State<AddProductPage> {
         });
       }
     } else {
-      final XFile? pickedImage =
-      await _picker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedImage = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedImage != null) {
         setState(() {
           _imageFile = pickedImage;
@@ -140,7 +138,26 @@ class _AddProductPageState extends State<AddProductPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add New Product')),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60),
+        child: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.blue.shade400,
+                  Colors.yellowAccent,
+                  Colors.indigo.shade500,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          title: Text('Add New Product'),
+          centerTitle: true,
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -149,28 +166,44 @@ class _AddProductPageState extends State<AddProductPage> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Product Name'),
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Enter product name'
-                    : null,
+                decoration: InputDecoration(
+                  labelText: 'Product Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.production_quantity_limits),
+                ),
+                validator: (value) => value == null || value.isEmpty ? 'Enter product name' : null,
               ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _unitPriceController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Unit Price'),
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Enter Unit price' : null,
+                decoration: InputDecoration(
+                  labelText: 'Unit Price',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.attach_money),
+                ),
+                validator: (value) => value == null || value.isEmpty ? 'Enter Unit price' : null,
               ),
+              SizedBox(height: 20),
               TextFormField(
                 controller: _stockController,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Stock'),
-                validator: (value) =>
-                value == null || value.isEmpty ? 'Enter Stock' : null,
+                decoration: InputDecoration(
+                  labelText: 'Stock',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixIcon: Icon(Icons.inventory),
+                ),
+                validator: (value) => value == null || value.isEmpty ? 'Enter Stock' : null,
               ),
+              SizedBox(height: 20),
               DateTimeFormField(
-                decoration:
-                const InputDecoration(labelText: 'Manufacture Date'),
+                decoration: const InputDecoration(labelText: 'Manufacture Date'),
                 mode: DateTimeFieldPickerMode.date,
                 onChanged: (DateTime? value) {
                   setState(() {
@@ -215,7 +248,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 decoration: InputDecoration(
                   labelText: 'Supplier Name',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.category_outlined),
+                  prefixIcon: Icon(Icons.person_outline),
                 ),
               ),
               SizedBox(height: 20),
@@ -230,21 +263,37 @@ class _AddProductPageState extends State<AddProductPage> {
                 decoration: InputDecoration(
                   labelText: 'Branch Name',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.category_outlined),
+                  prefixIcon: Icon(Icons.storefront),
                 ),
               ),
               SizedBox(height: 20),
               TextButton.icon(
                 icon: Icon(Icons.image),
                 label: Text('Upload Image'),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue,
+                ),
                 onPressed: _pickImage,
               ),
-              if (_imageData != null)
-                Image.memory(_imageData!, height: 150, fit: BoxFit.cover),
-              SizedBox(height: 16),
+              if (_imageData != null || _imageFile != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Image.memory(
+                    _imageData ?? Uint8List(0),
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _saveProduct,
                 child: Text('Save Product'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  textStyle: TextStyle(fontSize: 18),
+                ),
               ),
             ],
           ),

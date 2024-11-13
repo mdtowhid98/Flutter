@@ -114,13 +114,21 @@ class _CreateSalesState extends State<CreateSales> {
       double totalPrice = double.parse(totalPriceController.text);
       List<Map<String, dynamic>> productsToSubmit = [];
 
+      // Collect the products with their respective quantities and set salesDetails
       for (int i = 0; i < selectedProducts.length; i++) {
         if (selectedProducts[i] != null) {
+          int quantity = int.tryParse(quantityControllers[i].text) ?? 0; // Ensure quantity is added here
           productsToSubmit.add({
             'id': selectedProducts[i]!.id,
             'name': selectedProducts[i]!.name,
-            'quantity': int.tryParse(quantityControllers[i].text) ?? 0,
+            'quantity': quantity,
             'unitprice': selectedProducts[i]!.unitprice,
+            'salesDetails': {
+              'quantity': quantity, // Set the quantity for the product
+              'product': selectedProducts[i]!.toJson(), // Include product details
+              'totalPrice': (selectedProducts[i]!.unitprice! * quantity),
+              'discount': 0 // Add any discount logic here if needed
+            },
           });
         }
       }
@@ -131,7 +139,7 @@ class _CreateSalesState extends State<CreateSales> {
         'customername': customerName,
         'salesdate': salesDate!.toIso8601String(),
         'totalprice': totalPrice,
-        'product': productsToSubmit,
+        'product': productsToSubmit,  // Include quantity in the product data
       };
 
       final response = await salesService.createSales(
@@ -143,6 +151,7 @@ class _CreateSalesState extends State<CreateSales> {
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
+        // Navigate to the invoice page
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -150,13 +159,7 @@ class _CreateSalesState extends State<CreateSales> {
           ),
         );
 
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => ViewSales(),
-        //   ),
-        // );
-
+        // Clear input fields after submission
         customerNameController.clear();
         totalPriceController.clear();
         for (final controller in quantityControllers) {
@@ -165,7 +168,7 @@ class _CreateSalesState extends State<CreateSales> {
         setState(() {
           salesDate = DateTime.now();
           selectedProducts = [null];
-          quantityControllers = [TextEditingController()];
+          quantityControllers = [TextEditingController()];  // Reset quantities
           unitPriceControllers = [TextEditingController()];
         });
       } else {
@@ -173,6 +176,9 @@ class _CreateSalesState extends State<CreateSales> {
       }
     }
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {

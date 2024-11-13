@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/page/product/CreateProduct.dart';
-import 'package:point_of_sale/page/product/UpdateProduct.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 
 class AllProductView extends StatefulWidget with WidgetsBindingObserver {
@@ -13,6 +12,18 @@ class AllProductView extends StatefulWidget with WidgetsBindingObserver {
 
 class _AllProductViewState extends State<AllProductView> {
   late Future<List<Product>> futureProducts;
+  Map<int, bool> hoverStates = {}; // Map to store hover state for each product
+
+  final List<Color> cardColors = [
+    Colors.amber.shade100,
+    Colors.lightBlue.shade100,
+    Colors.lightGreen.shade100,
+    Colors.pink.shade100,
+    Colors.purple.shade100,
+    Colors.teal.shade100,
+    Colors.yellow.shade100,
+    Colors.orange.shade100,
+  ];
 
   @override
   void initState() {
@@ -27,192 +38,169 @@ class _AllProductViewState extends State<AllProductView> {
     }
   }
 
-  // void _updateProduct(Product product) {
-  //   Navigator.push(
-  //     context,
-  //     MaterialPageRoute(builder: (context) => UpdateProductView(product: product)),
-  //   ).then((_) {
-  //     setState(() {
-  //       futureProducts = ProductService().fetchProducts();
-  //     });
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Products'),
         centerTitle: true,
-        backgroundColor: Colors.teal,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.teal, Colors.lightGreenAccent, Colors.yellowAccent],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Navigate to CreateProduct page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddProductPage()),
+      body: FutureBuilder<List<Product>>(
+        future: futureProducts,
+        builder: (BuildContext context, AsyncSnapshot<List<Product>> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No products available'));
+          } else {
+            return ListView.builder(
+              padding: const EdgeInsets.all(12),
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                final product = snapshot.data![index];
+                final backgroundColor = cardColors[index % cardColors.length];
+
+                return MouseRegion(
+                  onEnter: (_) {
+                    setState(() {
+                      hoverStates[index] = true;
+                    });
+                  },
+                  onExit: (_) {
+                    setState(() {
+                      hoverStates[index] = false;
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: backgroundColor,
+                      border: Border.all(
+                        color: hoverStates[index] ?? false ? Colors.lime : Colors.transparent,
+                        width: 5,
+                      ),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Card(
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+                            // Replace ClipOval with ClipRRect
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10), // Set border radius for rounded corners if desired
+                              child: product.photo != null
+                                  ? Image.network(
+                                "http://localhost:8087/images/product/${product.photo}",
+                                height: 120,
+                                width: double.infinity, // Stretch to fit the container width
+                                fit: BoxFit.cover,
+                              )
+                                  : Container(
+                                height: 80,
+                                width: double.infinity,
+                                color: Colors.grey[300],
+                                child: Icon(
+                                  Icons.production_quantity_limits,
+                                  size: 30,
+                                  color: Colors.grey,
+                                ),
+                                alignment: Alignment.center,
+                              ),
+                            ),
+
+                            SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Product Name: ${product.name ?? 'N/A'}',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      Text(
+                                        'Unit Price: \$${product.unitprice ?? 'N/A'}',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      Text(
+                                        'Stock: ${product.stock ?? 'N/A'}',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      Text(
+                                        'Manufacture Date: ${product.manufactureDate ?? 'N/A'}',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Expiry Date: ${product.expiryDate ?? 'N/A'}',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      Text(
+                                        'Supplier: ${product.supplier?.name ?? 'Unknown Supplier'}',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      Text(
+                                        'Category: ${product.category?.categoryname ?? 'Unknown Category'}',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                      Text(
+                                        'Branch: ${product.branch?.branchName ?? 'Unknown Branch'}',
+                                        style: TextStyle(fontSize: 14),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 );
               },
-              child: Text('Create Product'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.teal, // Button color
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 24), // Button padding
-              ),
-            ),
-          ),
-          Expanded(
-            child: FutureBuilder<List<Product>>(
-              future: futureProducts,
-              builder: (BuildContext context, AsyncSnapshot<List<Product>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No products available'));
-                } else {
-                  return ListView.builder(
-                    padding: const EdgeInsets.all(12),
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      final product = snapshot.data![index];
-                      return Card(
-                        elevation: 6,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Container(
-                          width: double.infinity,
-                          height: 220,
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ClipOval(
-                                child: product.photo != null
-                                    ? Image.network(
-                                  "http://localhost:8087/images/product/${product.photo}",
-                                  height: 80,
-                                  width: 80,
-                                  fit: BoxFit.cover,
-                                )
-                                    : Container(
-                                  height: 80,
-                                  width: 80,
-                                  color: Colors.grey[300],
-                                  child: Icon(Icons.production_quantity_limits,
-                                      size: 30, color: Colors.grey),
-                                  alignment: Alignment.center,
-                                ),
-                              ),
-                              SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Product Name: ${product.name ?? 'N/A'}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 16,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      'Unit Price: \$${product.unitprice ?? 'N/A'}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 14,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      'Stock: ${product.stock ?? 'N/A'}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 14,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      'Manufacture Date: ${product.manufactureDate ?? 'N/A'}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 14,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Text(
-                                      'Expiry Date: ${product.expiryDate ?? 'N/A'}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 14,
-                                      ),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 5.0),
-                                      child: Text(
-                                        'Branch: ${product.branch?.branchName ?? 'Unknown Branch'}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 2.0),
-                                      child: Text(
-                                        'Category: ${product.category?.categoryname ?? 'Unknown Category'}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 2.0),
-                                      child: Text(
-                                        'Supplier: ${product.supplier?.name ?? 'Unknown Supplier'}',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  // IconButton(
-                                  //   icon: Icon(Icons.edit, color: Colors.blue),
-                                  //   onPressed: () => _updateProduct(product),
-                                  // ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                }
-              },
-            ),
-          ),
-        ],
+            );
+          }
+        },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddProductPage()),
+          );
+        },
+        backgroundColor: Colors.lightGreenAccent,
+        child: Icon(Icons.add),
       ),
     );
   }

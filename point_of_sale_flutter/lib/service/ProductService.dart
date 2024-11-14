@@ -92,6 +92,28 @@ class ProductService {
     }
   }
 
+  Future<List<Product>> getAllBananiBranchProducts() async {
+    final response = await http.get(Uri.parse('${apiUrl}banani'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => Product.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load products for Banani branch');
+    }
+  }
+
+  Future<List<Product>> getAllGulshanBranchProducts() async {
+    final response = await http.get(Uri.parse('${apiUrl}gulshan'));
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      return jsonResponse.map((data) => Product.fromJson(data)).toList();
+    } else {
+      throw Exception('Failed to load products for Gulshan branch');
+    }
+  }
+
 
   Future<void> updateProduct(int id, Product product) async {
     final response = await http.put(

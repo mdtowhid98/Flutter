@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'dart:typed_data';
@@ -159,146 +161,161 @@ class _AddProductPageState extends State<AddProductPage> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: 'Product Name',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          color: Colors.lightGreenAccent[100], // Set light green background color
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              children: [
+                if (_imageData != null || _imageFile != null)
+                  Center(
+                    child: CircleAvatar(
+                      radius: 50,
+                      backgroundImage: _imageData != null
+                          ? MemoryImage(_imageData!)
+                          : FileImage((foundation.kIsWeb ? _imageFile : null) as File) as ImageProvider,
+                    ),
                   ),
-                  prefixIcon: Icon(Icons.production_quantity_limits),
-                ),
-                validator: (value) => value == null || value.isEmpty ? 'Enter product name' : null,
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _unitPriceController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Unit Price',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                SizedBox(height: 8),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(
+                    labelText: 'Product Name',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   ),
-                  prefixIcon: Icon(Icons.attach_money),
+                  validator: (value) => value == null || value.isEmpty ? 'Enter product name' : null,
                 ),
-                validator: (value) => value == null || value.isEmpty ? 'Enter Unit price' : null,
-              ),
-              SizedBox(height: 20),
-              TextFormField(
-                controller: _stockController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Stock',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                SizedBox(height: 8),
+                TextFormField(
+                  controller: _unitPriceController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Unit Price',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   ),
-                  prefixIcon: Icon(Icons.inventory),
+                  validator: (value) => value == null || value.isEmpty ? 'Enter Unit price' : null,
                 ),
-                validator: (value) => value == null || value.isEmpty ? 'Enter Stock' : null,
-              ),
-              SizedBox(height: 20),
-              DateTimeFormField(
-                decoration: const InputDecoration(labelText: 'Manufacture Date'),
-                mode: DateTimeFieldPickerMode.date,
-                onChanged: (DateTime? value) {
-                  setState(() {
-                    selectedManufactureDate = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              DateTimeFormField(
-                decoration: const InputDecoration(labelText: 'Expiry Date'),
-                mode: DateTimeFieldPickerMode.date,
-                onChanged: (DateTime? value) {
-                  setState(() {
-                    selectedExpiryDate = value;
-                  });
-                },
-              ),
-              SizedBox(height: 20),
-              DropdownButtonFormField<Category>(
-                onChanged: (value) => setState(() => selectedCategory = value),
-                items: categories.map((category) {
-                  return DropdownMenuItem<Category>(
-                    value: category,
-                    child: Text(category.categoryname ?? 'Unknown Category'),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Category Name',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.category_outlined),
+                SizedBox(height: 8),
+                TextFormField(
+                  controller: _stockController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Stock',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
+                  validator: (value) => value == null || value.isEmpty ? 'Enter Stock' : null,
                 ),
-              ),
-              SizedBox(height: 20),
-              DropdownButtonFormField<Supplier>(
-                onChanged: (value) => setState(() => selectedSupplier = value),
-                items: suppliers.map((supplier) {
-                  return DropdownMenuItem<Supplier>(
-                    value: supplier,
-                    child: Text(supplier.name ?? 'Unknown Supplier'),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Supplier Name',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.person_outline),
+                SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DateTimeFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Manufacture Date',
+                          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                        ),
+                        mode: DateTimeFieldPickerMode.date,
+                        onChanged: (DateTime? value) {
+                          setState(() {
+                            selectedManufactureDate = value;
+                          });
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: DateTimeFormField(
+                        decoration: const InputDecoration(
+                          labelText: 'Expiry Date',
+                          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                        ),
+                        mode: DateTimeFieldPickerMode.date,
+                        onChanged: (DateTime? value) {
+                          setState(() {
+                            selectedExpiryDate = value;
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(height: 20),
-              DropdownButtonFormField<Branch>(
-                onChanged: (value) => setState(() => selectedBranch = value),
-                items: branches.map((branch) {
-                  return DropdownMenuItem<Branch>(
-                    value: branch,
-                    child: Text(branch.branchName ?? 'Unknown Branch'),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Branch Name',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.storefront),
-                ),
-              ),
-              SizedBox(height: 20),
-              TextButton.icon(
-                icon: Icon(Icons.image),
-                label: Text('Upload Image'),
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.blue,
-                ),
-                onPressed: _pickImage,
-              ),
-              if (_imageData != null || _imageFile != null)
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Image.memory(
-                    _imageData ?? Uint8List(0),
-                    height: 150,
-                    fit: BoxFit.cover,
+                SizedBox(height: 8),
+                DropdownButtonFormField<Category>(
+                  onChanged: (value) => setState(() => selectedCategory = value),
+                  items: categories.map((category) {
+                    return DropdownMenuItem<Category>(
+                      value: category,
+                      child: Text(category.categoryname ?? 'Unknown Category'),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Category Name',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
                   ),
                 ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _saveProduct,
-                child: Text('Save Product'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  textStyle: TextStyle(fontSize: 18),
+                SizedBox(height: 8),
+                DropdownButtonFormField<Supplier>(
+                  onChanged: (value) => setState(() => selectedSupplier = value),
+                  items: suppliers.map((supplier) {
+                    return DropdownMenuItem<Supplier>(
+                      value: supplier,
+                      child: Text(supplier.name ?? 'Unknown Supplier'),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Supplier Name',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 8),
+                DropdownButtonFormField<Branch>(
+                  onChanged: (value) => setState(() => selectedBranch = value),
+                  items: branches.map((branch) {
+                    return DropdownMenuItem<Branch>(
+                      value: branch,
+                      child: Text(branch.branchName ?? 'Unknown Branch'),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Branch Name',
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                  ),
+                ),
+                SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: _pickImage,
+                  icon: Icon(Icons.add_photo_alternate),
+                  label: Text('Choose Image'),
+                  style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 40)),
+                ),
+                SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: _saveProduct,
+                  icon: Icon(Icons.save),
+                  label: Text('Save Product'),
+                  style: ElevatedButton.styleFrom(minimumSize: Size(double.infinity, 40)),
+
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
 }

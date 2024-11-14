@@ -49,6 +49,9 @@ dependencies:
   http_parser: ^4.0.2
   printing: ^5.13.4
   pdf: ^3.11.1
+  fl_chart: ^0.69.0
+  pie_chart: ^5.4.0
+  flutter_pie_chart: ^0.0.1
 
 dev_dependencies:
   flutter_test:

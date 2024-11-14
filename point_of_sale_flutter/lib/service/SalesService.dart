@@ -160,6 +160,31 @@ class CreateSalesService {
     return response;
   }
 
+  Future<http.Response> createSalesBananiBranch(String customerName,
+      DateTime salesDate,
+      int totalPrice,
+      int quantity,
+      List<Product> products) async {
+    // Convert product list to JSON
+    List<Map<String, dynamic>> productJson = products.map((product) =>
+        product.toJson()).toList();
+
+    final response = await http.post(
+      Uri.parse("http://localhost:8087/api/sales/banani"),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+
+        'customername': customerName,
+        'salesdate': salesDate.toIso8601String(),
+        'totalprice': totalPrice,
+        'quantity': quantity,
+        'product': productJson,
+      }),
+    );
+
+    return response;
+  }
+
   Future<List<Product>> fetchProducts() async {
     try {
       final response = await http.get(Uri.parse('http://localhost:8087/api/product/'));

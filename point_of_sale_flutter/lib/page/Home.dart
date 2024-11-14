@@ -1,11 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/page/Sales/AllSalesView.dart';
+import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
 import 'package:point_of_sale/page/Sales/SalesDetails.dart';
 
 import 'package:point_of_sale/page/branch/AllBranchView.dart';
 import 'package:point_of_sale/page/category/AllCategoryView.dart';
 import 'package:point_of_sale/page/product/AllProductView.dart';
+import 'package:point_of_sale/page/product/StockList.dart';
+import 'package:point_of_sale/page/product/StockListBanani.dart';
+import 'package:point_of_sale/page/product/StockListGulshan.dart';
 import 'package:point_of_sale/page/supplier/AllSupplierView.dart';
 
 class Home extends StatefulWidget {
@@ -205,6 +209,26 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => AllCategoryView()),
+                          );
+                        }else if (index == 1) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CreateSalesBananiBranch()),
+                          );
+                        }else if (index == 9) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AllProductStockDhanmondi()),
+                          );
+                        }else if (index == 10) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AllProductStockBanani()),
+                          );
+                        }else if (index == 11) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AllProductStockGulshan()),
                           );
                         }
                       },

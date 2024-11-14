@@ -8,6 +8,7 @@ import 'package:point_of_sale/page/AdminPage.dart';
 import 'package:point_of_sale/page/BranchProfile.dart';
 import 'package:point_of_sale/page/Home.dart';
 import 'package:point_of_sale/page/Registration.dart';
+import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
 import 'package:point_of_sale/page/category/AllCategoryView.dart';
 import 'package:point_of_sale/service/AuthService.dart';
 
@@ -36,7 +37,7 @@ class _LoginState extends State<Login> {
       if (role == 'PHARMACIST') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => BranchProfile()),
+          MaterialPageRoute(builder: (context) => CreateSalesBananiBranch()),
         );
       } else if (role == 'ADMIN') {
         Navigator.pushReplacement(

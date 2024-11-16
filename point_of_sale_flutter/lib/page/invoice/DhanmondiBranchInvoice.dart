@@ -58,7 +58,6 @@ class InvoicePage extends StatelessWidget {
                         style: TextStyle(fontSize: 18, color: Colors.green)),
                     Text("Address: Dhanmondi, Dhaka"),
                     Text("Bangladesh"),
-                   
                   ],
                 ),
               ),
@@ -70,7 +69,8 @@ class InvoicePage extends StatelessWidget {
                 children: [
                   Text("Customer Name: ${sale['customername']}",
                       style: TextStyle(fontSize: 16)),
-                  Text("Sales Date: ${sale['salesdate']}",
+                  // Format the date to show only the date (not the time)
+                  Text("Sales Date: ${formatDate(sale['salesdate'])}",
                       style: TextStyle(fontSize: 16)),
                 ],
               ),
@@ -173,7 +173,12 @@ class InvoicePage extends StatelessWidget {
     );
   }
 
-  // Print function
+  // Format date function
+  String formatDate(String dateString) {
+    final date = DateTime.parse(dateString);
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
   // Print function
   void _printInvoice() async {
     // Load image from the network
@@ -216,7 +221,6 @@ class InvoicePage extends StatelessWidget {
                           style: pdf.TextStyle(fontSize: 18, color: PdfColors.green)),
                       pdf.Text("Address: Dhanmondi, Dhaka"),
                       pdf.Text("Bangladesh"),
-
                     ],
                   ),
                 ),
@@ -224,7 +228,7 @@ class InvoicePage extends StatelessWidget {
 
                 // Customer and Sales Info
                 pdf.Text("Customer Name: ${sale['customername']}"),
-                pdf.Text("Sales Date: ${sale['salesdate']}"),
+                pdf.Text("Sales Date: ${formatDate(sale['salesdate'])}"),
                 pdf.SizedBox(height: 20),
 
                 // Products Section
@@ -278,5 +282,4 @@ class InvoicePage extends StatelessWidget {
       },
     );
   }
-
 }

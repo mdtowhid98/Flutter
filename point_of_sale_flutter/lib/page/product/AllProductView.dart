@@ -12,7 +12,7 @@ class AllProductView extends StatefulWidget with WidgetsBindingObserver {
 
 class _AllProductViewState extends State<AllProductView> {
   late Future<List<Product>> futureProducts;
-  Map<int, bool> hoverStates = {}; // Map to store hover state for each product
+  Map<int, bool> hoverStates = {};
 
   final List<Color> cardColors = [
     Colors.amber.shade100,
@@ -29,6 +29,13 @@ class _AllProductViewState extends State<AllProductView> {
   void initState() {
     super.initState();
     futureProducts = ProductService().fetchProducts();
+  }
+
+  Future<void> _deleteProduct(Product product) async {
+    await ProductService().deleteProduct(product.id);
+    setState(() {
+      futureProducts = ProductService().fetchProducts();
+    });
   }
 
   @override
@@ -97,89 +104,104 @@ class _AllProductViewState extends State<AllProductView> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Container(
-                        width: double.infinity,
+                      child: Padding(
                         padding: const EdgeInsets.all(10),
-                        child: Column(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Replace ClipOval with ClipRRect
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(10), // Set border radius for rounded corners if desired
+                              borderRadius: BorderRadius.circular(10),
                               child: product.photo != null
                                   ? Image.network(
                                 "http://localhost:8087/images/product/${product.photo}",
                                 height: 120,
-                                width: double.infinity, // Stretch to fit the container width
+                                width: 120,
                                 fit: BoxFit.cover,
                               )
                                   : Container(
-                                height: 80,
-                                width: double.infinity,
+                                height: 120,
+                                width: 120,
                                 color: Colors.grey[300],
                                 child: Icon(
                                   Icons.production_quantity_limits,
-                                  size: 30,
+                                  size: 50,
                                   color: Colors.grey,
                                 ),
-                                alignment: Alignment.center,
                               ),
                             ),
-
-                            SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Product Name: ${product.name ?? 'N/A'}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                            SizedBox(width: 15),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Product Name: ${product.name ?? 'N/A'}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    'Unit Price: \$${product.unitprice ?? 'N/A'}',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  Text(
+                                    'Stock: ${product.stock ?? 'N/A'}',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  Text(
+                                    'Manufacture Date: ${product.manufactureDate ?? 'N/A'}',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  Text(
+                                    'Expiry Date: ${product.expiryDate ?? 'N/A'}',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  Text(
+                                    'Supplier: ${product.supplier?.name ?? 'Unknown Supplier'}',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  Text(
+                                    'Category: ${product.category?.categoryname ?? 'Unknown Category'}',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                  Text(
+                                    'Branch: ${product.branch?.branchName ?? 'Unknown Branch'}',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete, color: Colors.red),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text('Delete Product'),
+                                      content: Text('Are you sure you want to delete this product?'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Cancel'),
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                      Text(
-                                        'Unit Price: \$${product.unitprice ?? 'N/A'}',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      Text(
-                                        'Stock: ${product.stock ?? 'N/A'}',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      Text(
-                                        'Manufacture Date: ${product.manufactureDate ?? 'N/A'}',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Expiry Date: ${product.expiryDate ?? 'N/A'}',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      Text(
-                                        'Supplier: ${product.supplier?.name ?? 'Unknown Supplier'}',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      Text(
-                                        'Category: ${product.category?.categoryname ?? 'Unknown Category'}',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                      Text(
-                                        'Branch: ${product.branch?.branchName ?? 'Unknown Branch'}',
-                                        style: TextStyle(fontSize: 14),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                        TextButton(
+                                          onPressed: () {
+                                            _deleteProduct(product);
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: Text('Delete'),
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
                             ),
                           ],
                         ),

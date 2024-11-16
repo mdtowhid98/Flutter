@@ -3,6 +3,7 @@ import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdf;
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart'; // For date formatting
 
 class InvoicePageBananiBranch extends StatelessWidget {
   final Map<String, dynamic> sale;
@@ -58,7 +59,6 @@ class InvoicePageBananiBranch extends StatelessWidget {
                         style: TextStyle(fontSize: 18, color: Colors.green)),
                     Text("Address: Banani, Dhaka"),
                     Text("Bangladesh"),
-
                   ],
                 ),
               ),
@@ -70,8 +70,10 @@ class InvoicePageBananiBranch extends StatelessWidget {
                 children: [
                   Text("Customer Name: ${sale['customername']}",
                       style: TextStyle(fontSize: 16)),
-                  Text("Sales Date: ${sale['salesdate']}",
-                      style: TextStyle(fontSize: 16)),
+                  Text(
+                    "Sales Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(sale['salesdate']))}",
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ],
               ),
               SizedBox(height: 20),
@@ -174,7 +176,6 @@ class InvoicePageBananiBranch extends StatelessWidget {
   }
 
   // Print function
-  // Print function
   void _printInvoice() async {
     // Load image from the network
     final response = await http.get(Uri.parse("https://i.postimg.cc/ry95B8nc/download-9.jpg"));
@@ -212,11 +213,10 @@ class InvoicePageBananiBranch extends StatelessWidget {
                     children: [
                       pdf.Text("Towhid Medical",
                           style: pdf.TextStyle(fontSize: 24, fontWeight: pdf.FontWeight.bold, color: PdfColors.green)),
-                      pdf.Text("Dhanmondi Branch",
+                      pdf.Text("Banani Branch",
                           style: pdf.TextStyle(fontSize: 18, color: PdfColors.green)),
-                      pdf.Text("Address: Dhanmondi, Dhaka"),
+                      pdf.Text("Address: Banani, Dhaka"),
                       pdf.Text("Bangladesh"),
-
                     ],
                   ),
                 ),
@@ -224,7 +224,9 @@ class InvoicePageBananiBranch extends StatelessWidget {
 
                 // Customer and Sales Info
                 pdf.Text("Customer Name: ${sale['customername']}"),
-                pdf.Text("Sales Date: ${sale['salesdate']}"),
+                pdf.Text(
+                  "Sales Date: ${DateFormat('yyyy-MM-dd').format(DateTime.parse(sale['salesdate']))}",
+                ),
                 pdf.SizedBox(height: 20),
 
                 // Products Section
@@ -265,7 +267,7 @@ class InvoicePageBananiBranch extends StatelessWidget {
                       pdf.SizedBox(height: 10),
                       pdf.Text("Towhid Medicine Collection"),
                       pdf.Text("Phone: 01767515057"),
-                      pdf.Text("Dhanmondi, Dhaka, Bangladesh"),
+                      pdf.Text("Banani, Dhaka, Bangladesh"),
                     ],
                   ),
                 ),
@@ -278,5 +280,4 @@ class InvoicePageBananiBranch extends StatelessWidget {
       },
     );
   }
-
 }

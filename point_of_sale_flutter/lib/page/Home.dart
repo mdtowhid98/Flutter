@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/page/Sales/AllSalesView.dart';
 import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
+import 'package:point_of_sale/page/Sales/CustomerReoprts.dart';
+import 'package:point_of_sale/page/Sales/SalesChart.dart';
 import 'package:point_of_sale/page/Sales/SalesDetails.dart';
 
 import 'package:point_of_sale/page/branch/AllBranchView.dart';
@@ -229,6 +231,21 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => AllProductStockGulshan()),
+                          );
+                        }else if (index == 5) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => ViewSales()),
+                          );
+                        }else if (index == 12) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CustomerReports()),
+                          );
+                        }else if (index == 13) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SalesChart()),
                           );
                         }
                       },

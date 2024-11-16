@@ -13,16 +13,17 @@ class AllProductStockDhanmondi extends StatefulWidget with WidgetsBindingObserve
 class _AllProductStockDhanmondiState extends State<AllProductStockDhanmondi> {
   late Future<List<Product>> futureProducts;
   Map<int, bool> hoverStates = {};
+  int? hoveredIndex;
 
   final List<Color> cardColors = [
-    Colors.amber.shade100,
-    Colors.lightBlue.shade100,
-    Colors.lightGreen.shade100,
-    Colors.pink.shade100,
-    Colors.purple.shade100,
-    Colors.teal.shade100,
-    Colors.yellow.shade100,
-    Colors.orange.shade100,
+    Colors.redAccent,
+    Colors.blueAccent,
+    Colors.greenAccent,
+    Colors.yellowAccent,
+    Colors.lightGreenAccent,
+    Colors.teal,
+    Colors.amberAccent,
+    Colors.orange,
   ];
 
   @override
@@ -64,7 +65,7 @@ class _AllProductStockDhanmondiState extends State<AllProductStockDhanmondi> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No products available'));
           } else {
-            // Prepare data for the pie chart, calculating stock per product
+            // Prepare data for the pie chart
             Map<String, double> stockData = {};
             snapshot.data!.forEach((product) {
               final productName = product.name ?? 'Unknown Product';
@@ -77,7 +78,7 @@ class _AllProductStockDhanmondiState extends State<AllProductStockDhanmondi> {
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
-                      // Pie chart
+                      // Animated Pie chart
                       Expanded(
                         flex: 3,
                         child: SizedBox(
@@ -86,22 +87,36 @@ class _AllProductStockDhanmondiState extends State<AllProductStockDhanmondi> {
                             PieChartData(
                               sections: stockData.entries.map((entry) {
                                 int colorIndex = stockData.keys.toList().indexOf(entry.key) % cardColors.length;
+                                bool isHovered = hoveredIndex == colorIndex;
+
                                 return PieChartSectionData(
                                   color: cardColors[colorIndex],
                                   value: entry.value,
-                                  title: '${entry.key}\n${entry.value.toInt()}',
-                                  radius: 60, // Increased radius to fill the middle
+                                  title: '${entry.value}', // Display the stock value as the label
                                   titleStyle: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),
+                                  radius: isHovered ? 70 : 60,
+                                  borderSide: BorderSide(
+                                    color: isHovered ? Colors.lightGreenAccent : Colors.transparent,
+                                    width: 4,
+                                  ),
                                 );
                               }).toList(),
-                              sectionsSpace: 0, // No space between sections for a complete circle
-                              centerSpaceRadius: 40, // Smaller center circle
+                              sectionsSpace: 0,
+                              centerSpaceRadius: 40,
+                              pieTouchData: PieTouchData(
+                                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                  setState(() {});
+                                },
+                              ),
                             ),
+                            swapAnimationDuration: Duration(milliseconds: 800),
+                            swapAnimationCurve: Curves.easeInOut,
                           ),
+
                         ),
                       ),
                       // Legend (Product Names with Colors)
@@ -146,11 +161,13 @@ class _AllProductStockDhanmondiState extends State<AllProductStockDhanmondi> {
                         onEnter: (_) {
                           setState(() {
                             hoverStates[index] = true;
+                            hoveredIndex = index % cardColors.length;
                           });
                         },
                         onExit: (_) {
                           setState(() {
                             hoverStates[index] = false;
+                            hoveredIndex = null;
                           });
                         },
                         child: AnimatedContainer(

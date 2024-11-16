@@ -129,6 +129,13 @@ class ProductService {
     }
   }
 
+  Future<void> deleteProduct(int? id) async {
+    final response = await http
+        .delete(Uri.parse('http://localhost:8087/api/product/delete/$id'));
+    if (response.statusCode != 200) {
+      throw Exception('Failed to delete product');
+    }
+  }
 
 
 }

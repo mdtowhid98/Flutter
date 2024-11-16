@@ -13,16 +13,17 @@ class AllProductStockBanani extends StatefulWidget with WidgetsBindingObserver {
 class _AllProductStockBananiState extends State<AllProductStockBanani> {
   late Future<List<Product>> futureProducts;
   Map<int, bool> hoverStates = {};
+  int? hoveredIndex;
 
   final List<Color> cardColors = [
-    Colors.amber.shade100,
-    Colors.lightBlue.shade100,
-    Colors.lightGreen.shade100,
-    Colors.pink.shade100,
-    Colors.purple.shade100,
-    Colors.teal.shade100,
-    Colors.yellow.shade100,
-    Colors.orange.shade100,
+    Colors.red,
+    Colors.blueAccent,
+    Colors.greenAccent,
+    Colors.yellowAccent,
+    Colors.lightGreenAccent,
+    Colors.teal,
+    Colors.amberAccent,
+    Colors.orange,
   ];
 
   @override
@@ -64,7 +65,7 @@ class _AllProductStockBananiState extends State<AllProductStockBanani> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No products available'));
           } else {
-            // Prepare data for the pie chart, calculating stock per product
+            // Prepare data for the pie chart
             Map<String, double> stockData = {};
             snapshot.data!.forEach((product) {
               final productName = product.name ?? 'Unknown Product';
@@ -75,55 +76,77 @@ class _AllProductStockBananiState extends State<AllProductStockBanani> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: SizedBox(
-                    height: 250,
-                    child: PieChart(
-                      PieChartData(
-                        sections: stockData.entries.map((entry) {
-                          int colorIndex = stockData.keys.toList().indexOf(entry.key) % cardColors.length;
-                          return PieChartSectionData(
-                            color: cardColors[colorIndex],
-                            value: entry.value,
-                            // Remove the product name from the title and show stock value
-                            title: '${entry.value.toInt()}', // Only stock value
-                            radius: 50, // Adjust radius as necessary
-                            titleStyle: TextStyle(
-                              fontSize: 10, // Adjust font size to fit inside the circle
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              fontFamily: 'Arial', // Optional, customize font style
-                            ),
-                          );
-                        }).toList(),
-                        sectionsSpace: 2,
-                        centerSpaceRadius: 40, // Adjust the center space to fit titles
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
-                    children: stockData.entries.map((entry) {
-                      int colorIndex = stockData.keys.toList().indexOf(entry.key) % cardColors.length;
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 20,
-                              height: 20,
-                              color: cardColors[colorIndex],
+                    children: [
+                      // Animated Pie chart
+                      Expanded(
+                        flex: 3,
+                        child: SizedBox(
+                          height: 250,
+                          child: PieChart(
+                            PieChartData(
+                              sections: stockData.entries.map((entry) {
+                                int colorIndex = stockData.keys.toList().indexOf(entry.key) % cardColors.length;
+                                bool isHovered = hoveredIndex == colorIndex;
+
+                                return PieChartSectionData(
+                                  color: cardColors[colorIndex],
+                                  value: entry.value,
+                                  title: '${entry.value}', // Display the stock value as the label
+                                  titleStyle: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  radius: isHovered ? 70 : 60,
+                                  borderSide: BorderSide(
+                                    color: isHovered ? Colors.lightGreenAccent : Colors.transparent,
+                                    width: 4,
+                                  ),
+                                );
+                              }).toList(),
+                              sectionsSpace: 0,
+                              centerSpaceRadius: 40,
+                              pieTouchData: PieTouchData(
+                                touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                                  setState(() {});
+                                },
+                              ),
                             ),
-                            SizedBox(width: 10),
-                            Text(
-                              entry.key,
-                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                            ),
-                          ],
+                            swapAnimationDuration: Duration(milliseconds: 800),
+                            swapAnimationCurve: Curves.easeInOut,
+                          ),
+
                         ),
-                      );
-                    }).toList(),
+                      ),
+                      // Legend (Product Names with Colors)
+                      Expanded(
+                        flex: 2,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: stockData.entries.map((entry) {
+                            int colorIndex = stockData.keys.toList().indexOf(entry.key) % cardColors.length;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 20,
+                                    height: 20,
+                                    color: cardColors[colorIndex],
+                                  ),
+                                  SizedBox(width: 10),
+                                  Text(
+                                    entry.key,
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -138,11 +161,13 @@ class _AllProductStockBananiState extends State<AllProductStockBanani> {
                         onEnter: (_) {
                           setState(() {
                             hoverStates[index] = true;
+                            hoveredIndex = index % cardColors.length;
                           });
                         },
                         onExit: (_) {
                           setState(() {
                             hoverStates[index] = false;
+                            hoveredIndex = null;
                           });
                         },
                         child: AnimatedContainer(

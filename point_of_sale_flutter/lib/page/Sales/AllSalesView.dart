@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:point_of_sale/model/Sale.dart';
 import 'package:point_of_sale/service/SalesService.dart';
 
@@ -47,14 +48,13 @@ class _ViewSalesState extends State<ViewSales> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Date: ${sale.salesdate}'),
+                  Text('Date: ${sale.salesdate != null ? DateFormat('yyyy-MM-dd').format(sale.salesdate!) : 'N/A'}'),
+
                   Text('Total Price: \$${sale.totalprice}'),
                   Text('Products:'),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: sale.product?.map((product) {
-                      // Debugging print statement to check product details
-                      print('Product Name: ${product.name}, Unit Price: ${product.unitprice}');
                       return Text(
                         '${product.name ?? 'Unnamed Product'} - Unit Price: \$${product.unitprice ?? 0}',
                         style: TextStyle(fontSize: 14),

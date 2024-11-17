@@ -88,11 +88,11 @@ public class SalesService {
             salesDetails.setProduct(product);
             salesDetails.setQuantity(soldProduct.getQuantity());
             salesDetails.setUnitPrice(product.getUnitprice());
-            salesDetails.setDiscount(sales.getDiscount());
+//            salesDetails.setDiscount(sales.getDiscount());
 
             // Calculate total price after discount
-            float discount = sales.getDiscount();
-            float totalPrice = soldProduct.getQuantity() * product.getUnitprice() * (1 - discount / 100);
+//            float discount = 0.10f;
+            float totalPrice = soldProduct.getQuantity() * product.getUnitprice();
             salesDetails.setTotalPrice(totalPrice);
 
             salesDetailsRepository.save(salesDetails);

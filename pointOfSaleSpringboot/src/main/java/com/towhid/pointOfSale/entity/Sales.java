@@ -23,7 +23,8 @@ public class Sales {
     private int totalprice;
 
     private int quantity;
-    private float discount;
+    @Column(nullable = true)
+    private float discount=0.00f;
 
 
 

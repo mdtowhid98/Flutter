@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/physics.dart';
 import 'package:http/http.dart' as http;
 import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/model/Sale.dart';
@@ -142,8 +143,12 @@ class CreateSalesService {
       int quantity,
       List<Product> products) async {
     // Convert product list to JSON
+
+
     List<Map<String, dynamic>> productJson = products.map((product) =>
         product.toJson()).toList();
+    print(productJson);
+
 
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -160,6 +165,8 @@ class CreateSalesService {
     return response;
   }
 
+
+
   Future<http.Response> createSalesBananiBranch(String customerName,
       DateTime salesDate,
       int totalPrice,
@@ -169,6 +176,7 @@ class CreateSalesService {
     List<Map<String, dynamic>> productJson = products.map((product) =>
         product.toJson()).toList();
 
+    print(productJson);
     final response = await http.post(
       Uri.parse("http://localhost:8087/api/sales/banani"),
       headers: {'Content-Type': 'application/json'},
@@ -191,6 +199,7 @@ class CreateSalesService {
 
       if (response.statusCode == 200) {
         List jsonResponse = json.decode(response.body);
+        print(jsonResponse);
         return jsonResponse.map((product) => Product.fromJson(product)).toList();
       } else {
         throw Exception('Failed to load products');

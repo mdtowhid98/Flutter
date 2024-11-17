@@ -1,11 +1,9 @@
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
-import 'package:point_of_sale/page/Sales/AllSalesView.dart';
 import 'package:point_of_sale/page/invoice/DhanmondiBranchInvoice.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 import 'package:point_of_sale/service/SalesService.dart';
-
 
 class CreateSales extends StatefulWidget {
   @override
@@ -107,78 +105,170 @@ class _CreateSalesState extends State<CreateSales> {
     }
     return true;
   }
-
+  int quantity=0;
   void _createSales() async {
     if (_formKey.currentState!.validate() && salesDate != null && _validateQuantities()) {
       String customerName = customerNameController.text;
       double totalPrice = double.parse(totalPriceController.text);
-      List<Map<String, dynamic>> productsToSubmit = [];
 
-      // Collect the products with their respective quantities and set salesDetails
-      for (int i = 0; i < selectedProducts.length; i++) {
-        if (selectedProducts[i] != null) {
-          int quantity = int.tryParse(quantityControllers[i].text) ?? 0; // Ensure quantity is added here
-          productsToSubmit.add({
-            'id': selectedProducts[i]!.id,
-            'name': selectedProducts[i]!.name,
-            'quantity': quantity,
-            'unitprice': selectedProducts[i]!.unitprice,
+
+      // Prepare products for the API request
+      List<Map> productsToSubmit = selectedProducts.asMap().entries.map((entry) {
+        int index = entry.key;
+        Product? product = entry.value;
+
+        if (product != null) {
+          quantity = int.tryParse(quantityControllers[index].text) ?? 0;  // Default to 0 if parsing fails
+          print('Quantity: $quantity');
+          product.quantity=quantity;
+          return {
+            'id': product.id,
+            'name': product.name,
+            'quantity': product.quantity,
+            'unitprice': product.unitprice,
             'salesDetails': {
-              'quantity': quantity, // Set the quantity for the product
-              'product': selectedProducts[i]!.toJson(), // Include product details
-              'totalPrice': (selectedProducts[i]!.unitprice! * quantity),
-              'discount': 0 // Add any discount logic here if needed
+              'quantity': product.quantity,
+              'product': product.toJson(),
+              'totalPrice': (product.unitprice! * quantity),
+              'discount': 0.0,
             },
-          });
+          };
         }
-      }
-
-      final nonNullSelectedProducts = selectedProducts.whereType<Product>().toList();
+        return {};
+      }).toList();
 
       final saleData = {
+
         'customername': customerName,
         'salesdate': salesDate!.toIso8601String(),
         'totalprice': totalPrice,
-        'product': productsToSubmit,  // Include quantity in the product data
+        'product': productsToSubmit,
       };
 
-      final response = await salesService.createSales(
-        customerName,
-        salesDate!,
-        totalPrice.toInt(),
-        productsToSubmit.length,
-        nonNullSelectedProducts,
-      );
-
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        // Navigate to the invoice page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => InvoicePage(sale: saleData),
-          ),
+      try {
+        final response = await salesService.createSales(
+          customerName,
+          salesDate!,
+          totalPrice.toInt(),
+          productsToSubmit.length,
+          selectedProducts.whereType<Product>().toList(),
         );
 
-        // Clear input fields after submission
-        customerNameController.clear();
-        totalPriceController.clear();
-        for (final controller in quantityControllers) {
-          controller.clear();
+        if (response.statusCode == 201 || response.statusCode == 200) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InvoicePage(sale: saleData),
+            ),
+          );
+          _resetForm();
+        } else {
+          _showErrorDialog('Failed to create sales. Status: ${response.statusCode}');
         }
-        setState(() {
-          salesDate = DateTime.now();
-          selectedProducts = [null];
-          quantityControllers = [TextEditingController()];  // Reset quantities
-          unitPriceControllers = [TextEditingController()];
-        });
-      } else {
-        print('Sales creation failed with status: ${response.statusCode}');
+      } catch (e) {
+        _showErrorDialog('An error occurred: $e');
       }
     }
   }
 
+  void _resetForm() {
+    customerNameController.clear();
+    totalPriceController.clear();
+    for (final controller in quantityControllers) {
+      controller.clear();
+    }
+    setState(() {
+      salesDate = DateTime.now();
+      selectedProducts = [null];
+      quantityControllers = [TextEditingController()];
+      unitPriceControllers = [TextEditingController()];
+    });
+  }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
+  // void _createSales() async {
+  //   if (_formKey.currentState!.validate() && salesDate != null && _validateQuantities()) {
+  //     String customerName = customerNameController.text;
+  //     double totalPrice = double.parse(totalPriceController.text);
+  //     List<Map<String, dynamic>> productsToSubmit = [];
+  //
+  //     // Collect the products with their respective quantities and set salesDetails
+  //     for (int i = 0; i < selectedProducts.length; i++) {
+  //       if (selectedProducts[i] != null) {
+  //         int quantity = int.tryParse(quantityControllers[i].text) ?? 0; // Ensure quantity is added here
+  //         productsToSubmit.add({
+  //           'id': selectedProducts[i]!.id,
+  //           'name': selectedProducts[i]!.name,
+  //           'quantity': quantity,
+  //           'unitprice': selectedProducts[i]!.unitprice,
+  //           'salesDetails': {
+  //             'quantity': quantity, // Set the quantity for the product
+  //             'product': selectedProducts[i]!.toJson(), // Include product details
+  //             'totalPrice': (selectedProducts[i]!.unitprice! * quantity),
+  //             'discount': 0 // Add any discount logic here if needed
+  //           },
+  //         });
+  //       }
+  //     }
+  //
+  //     final nonNullSelectedProducts = selectedProducts.whereType<Product>().toList();
+  //
+  //     final saleData = {
+  //       'customername': customerName,
+  //       'salesdate': salesDate!.toIso8601String(),
+  //       'totalprice': totalPrice,
+  //       'product': productsToSubmit,  // Include quantity in the product data
+  //     };
+  //
+  //     final response = await salesService.createSales(
+  //       customerName,
+  //       salesDate!,
+  //       totalPrice.toInt(),
+  //       productsToSubmit.length,
+  //       nonNullSelectedProducts,
+  //     );
+  //
+  //     if (response.statusCode == 201 || response.statusCode == 200) {
+  //       // Navigate to the invoice page
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => InvoicePage(sale: saleData),
+  //         ),
+  //       );
+  //
+  //       // Clear input fields after submission
+  //       customerNameController.clear();
+  //       totalPriceController.clear();
+  //       for (final controller in quantityControllers) {
+  //         controller.clear();
+  //       }
+  //       setState(() {
+  //         salesDate = DateTime.now();
+  //         selectedProducts = [null];
+  //         quantityControllers = [TextEditingController()];  // Reset quantities
+  //         unitPriceControllers = [TextEditingController()];
+  //       });
+  //     } else {
+  //       print('Sales creation failed with status: ${response.statusCode}');
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -289,26 +379,19 @@ class _CreateSalesState extends State<CreateSales> {
                   decoration: InputDecoration(
                     labelText: 'Total Price',
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.price_check),
+                    prefixIcon: Icon(Icons.money),
                   ),
                   readOnly: true,
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _addProductField,
-                  child: Text("Add Product"),
+                  child: Text('Add Product'),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _createSales,
-                  child: Text(
-                    "Create Sales",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    foregroundColor: Colors.white,
-                  ),
+                  child: Text('Create Sale'),
                 ),
               ],
             ),

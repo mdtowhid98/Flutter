@@ -24,6 +24,7 @@ public class SalesRestController {
     // Create sales for "Dhanmondi" branch
     @PostMapping("/dhanmondi")
     public ResponseEntity<Sales> createSalesForDhanmondi(@RequestBody Sales sales) {
+        sales.setDiscount(0);
         Sales createdSales = salesService.saveSalesForDhanmondi(sales);
         return ResponseEntity.ok(createdSales);
     }

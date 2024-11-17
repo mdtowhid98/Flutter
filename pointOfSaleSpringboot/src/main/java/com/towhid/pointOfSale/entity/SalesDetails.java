@@ -4,11 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SalesDetails {
+public class SalesDetails implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,6 +32,6 @@ public class SalesDetails {
 
     private float unitPrice;
     private float totalPrice;
-    private float discount;
+
 
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/SalesDetails.dart';
-import 'package:point_of_sale/page/Sales/CreateSales.dart';
 import 'package:point_of_sale/service/SalesDetailsService.dart';
-
 
 class ViewSalesDetailsScreen extends StatefulWidget {
   @override
@@ -55,50 +53,109 @@ class _ViewSalesDetailsScreenState extends State<ViewSalesDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Sales Details')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Search by Customer Name or Sales ID',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.search),
-              ),
-              onChanged: (value) {
-                searchTerm = value;
-                _searchCustomerNameOrId(searchTerm);
-              },
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredSalesDetails.length,
-                itemBuilder: (context, index) {
-                  final sale = filteredSalesDetails[index];
-                  return Card(
-                    child: ListTile(
-                      title: Text('Customer: ${sale.sale?.customername ?? 'N/A'}'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('Sales ID: ${sale.id}'),
-                          Text('Quantity: ${sale.quantity}'),
-                          Text('Unit Price: \$${sale.unitPrice}'),
-                          Text('Total Price: \$${sale.totalPrice}'),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.lightBlueAccent,
+            Colors.lightGreenAccent,
+            Colors.orangeAccent,
           ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
       ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text('Sales Details'),
+          centerTitle: true,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.orange, Colors.lightGreenAccent, Colors.yellowAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Search by Customer Name or Sales ID',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.search),
+                ),
+                onChanged: (value) {
+                  searchTerm = value;
+                  _searchCustomerNameOrId(searchTerm);
+                },
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredSalesDetails.length,
+                  itemBuilder: (context, index) {
+                    final sale = filteredSalesDetails[index];
+                    return _buildHoverableCard(sale);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHoverableCard(SalesDetails sale) {
+    bool isHovered = false;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return MouseRegion(
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              side: BorderSide(
+                color: isHovered ? Colors.red : Colors.grey, // Change border color on hover
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListTile(
+              title: Text(
+                'Customer: ${sale.sale?.customername ?? 'N/A'}',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.indigo,
+                  fontSize: 17,
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Sales ID: ${sale.id}'),
+                  Text('Quantity: ${sale.quantity}'),
+                  Text('Unit Price: \$${sale.unitPrice}'),
+                  Text(
+                    'Total Price: \$${sale.totalPrice}',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

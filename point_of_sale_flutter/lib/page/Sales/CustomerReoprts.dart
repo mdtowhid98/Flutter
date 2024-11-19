@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:point_of_sale/model/Sale.dart';
 import 'package:point_of_sale/service/SalesService.dart';
 
@@ -10,7 +11,6 @@ class CustomerReports extends StatefulWidget {
 class _CustomerReportsState extends State<CustomerReports> with SingleTickerProviderStateMixin {
   final SalesService salesService = SalesService();
   List<Sale> sales = [];
-  int? _hoveredIndex; // Track the hovered card's index
 
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -21,7 +21,7 @@ class _CustomerReportsState extends State<CustomerReports> with SingleTickerProv
     loadSales();
     _animationController = AnimationController(
       duration: Duration(seconds: 2),
-      vsync: this,
+      vsync: this, // Pass `this` for the `vsync` argument
     )..forward();
 
     _animation = Tween<double>(begin: 0.0, end: 1.0).animate(CurvedAnimation(
@@ -68,6 +68,21 @@ class _CustomerReportsState extends State<CustomerReports> with SingleTickerProv
     }
   }
 
+  // Function to determine a color for each bar based on the total price
+  Color getBarColor(double totalPrice) {
+    if (totalPrice > 10000) {
+      return Colors.green;
+    } else if (totalPrice > 8000) {
+      return Colors.blue;
+    } else if (totalPrice > 5000) {
+      return Colors.orange;
+    } else if (totalPrice > 2000) {
+      return Colors.yellow;
+    } else {
+      return Colors.red;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final customerTotalSales = getCustomerTotalSales();
@@ -95,14 +110,24 @@ class _CustomerReportsState extends State<CustomerReports> with SingleTickerProv
                 child: AnimatedBuilder(
                   animation: _animation,
                   builder: (context, child) {
-                    return CustomPaint(
-                      size: Size(200, 200), // Size for the bar chart
-                      painter: BarChartPainter(customerTotalSales, _animation.value),
+                    return SfCartesianChart(
+                      primaryXAxis: CategoryAxis(),
+                      primaryYAxis: NumericAxis(),
+                      series: <CartesianSeries<MapEntry<String, double>, String>>[
+                        ColumnSeries<MapEntry<String, double>, String>(
+                          dataSource: customerTotalSales.entries.toList(),
+                          xValueMapper: (MapEntry<String, double> sales, _) => sales.key,
+                          yValueMapper: (MapEntry<String, double> sales, _) => sales.value,
+                          pointColorMapper: (MapEntry<String, double> sales, _) => getBarColor(sales.value),
+                          name: 'Total Sales',
+                        ),
+                      ],
                     );
                   },
                 ),
               ),
             ),
+
           Expanded(
             child: ListView.builder(
               itemCount: customerTotalSales.length,
@@ -114,22 +139,18 @@ class _CustomerReportsState extends State<CustomerReports> with SingleTickerProv
                 return MouseRegion(
                   onEnter: (_) {
                     setState(() {
-                      _hoveredIndex = index;
+                      // Track the hovered index if needed
                     });
                   },
                   onExit: (_) {
                     setState(() {
-                      _hoveredIndex = null;
+                      // Reset hover state
                     });
                   },
                   child: Card(
                     margin: EdgeInsets.all(8.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
-                      side: BorderSide(
-                        color: _hoveredIndex == index ? Colors.blue : Colors.transparent, // Change border color on hover
-                        width: 2.0,
-                      ),
                     ),
                     child: ListTile(
                       title: Text('Customer: $customerName'),
@@ -154,43 +175,4 @@ class _CustomerReportsState extends State<CustomerReports> with SingleTickerProv
       ),
     );
   }
-
 }
-
-class BarChartPainter extends CustomPainter {
-  final Map<String, double> customerTotalSales;
-  final double animationValue;
-  final double barGap = 4.0; // Define the gap between bars
-
-  BarChartPainter(this.customerTotalSales, this.animationValue);
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    double totalSales = customerTotalSales.values.fold(0, (sum, value) => sum + value);
-    double barWidth = (size.width - (barGap * (customerTotalSales.length - 1))) / customerTotalSales.length;
-    double maxBarHeight = size.height;
-
-    Paint paint = Paint()..style = PaintingStyle.fill;
-
-    double offsetX = 0;
-
-    for (var entry in customerTotalSales.entries) {
-      double barHeight = (entry.value / totalSales) * maxBarHeight;
-      paint.color = Colors.primaries[entry.key.hashCode % Colors.primaries.length];
-
-      // Animate the bar height based on the animation value
-      canvas.drawRect(
-        Rect.fromLTWH(offsetX, size.height - (barHeight * animationValue), barWidth, barHeight * animationValue),
-        paint,
-      );
-
-      offsetX += barWidth + barGap; // Add the gap between bars
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
-

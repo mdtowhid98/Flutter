@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:point_of_sale/model/Sale.dart';
 import 'package:point_of_sale/service/SalesService.dart';
 
@@ -25,7 +25,6 @@ class _SalesChartState extends State<SalesChart> {
     try {
       final salesData = await salesService.getAllSales();
       if (selectedDateRange != null) {
-        // Filter sales data based on selected date range
         salesData.removeWhere((sale) => sale.salesdate == null ||
             sale.salesdate!.isBefore(selectedDateRange!.start) ||
             sale.salesdate!.isAfter(selectedDateRange!.end));
@@ -50,13 +49,6 @@ class _SalesChartState extends State<SalesChart> {
     });
   }
 
-  double calculateInterval() {
-    if (groupedSales.isEmpty) return 10;
-    double maxValue = groupedSales.values.reduce((a, b) => a > b ? a : b);
-    // Calculate interval to ensure consistent scale for Y-axis
-    return (maxValue / 5).ceilToDouble();
-  }
-
   void scrollChart(double offset) {
     _scrollController.animateTo(
       _scrollController.offset + offset,
@@ -69,7 +61,7 @@ class _SalesChartState extends State<SalesChart> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sales Chart'),
+        title: Text('Sales Chart', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -81,157 +73,165 @@ class _SalesChartState extends State<SalesChart> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Select Date Range: '),
-                IconButton(
-                  icon: Icon(Icons.calendar_today),
-                  onPressed: () async {
-                    final DateTimeRange? picked = await showDateRangePicker(
-                      context: context,
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2101),
-                    );
-                    if (picked != null && picked != selectedDateRange) {
-                      setState(() {
-                        selectedDateRange = picked;
-                      });
-                      loadSales();
-                    }
-                  },
-                ),
-              ],
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.lightGreenAccent, Colors.blue.shade300],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          // Scroll buttons placed under the date range picker
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.arrow_left),
-                  onPressed: () {
-                    scrollChart(-100); // Scroll left by 100 pixels
-                  },
-                ),
-                IconButton(
-                  icon: Icon(Icons.arrow_right),
-                  onPressed: () {
-                    scrollChart(100); // Scroll right by 100 pixels
-                  },
-                ),
-              ],
-            ),
-          ),
-          Divider(),
-          groupedSales.isEmpty
-              ? Center(child: CircularProgressIndicator())
-              : Expanded(
-            flex: 2,
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                width: groupedSales.length * 80.0, // Adjusted width per bar
-                child: BarChart(
-                  BarChartData(
-                    alignment: BarChartAlignment.spaceBetween,
-                    barGroups: groupedSales.entries
-                        .map((entry) {
-                      int index = groupedSales.keys
-                          .toList()
-                          .indexOf(entry.key);
-                      Color barColor = Colors.primaries[
-                      index % Colors.primaries.length];
-                      return BarChartGroupData(
-                        x: index,
-                        barRods: [
-                          BarChartRodData(
-                            toY: entry.value,
-                            color: barColor,
-                            width: 35, // Slightly wider bars
-                            borderRadius: BorderRadius.circular(8), // Rounded corners
-                            backDrawRodData: BackgroundBarChartRodData(
-                              show: true,
-                              color: Colors.grey.withOpacity(0.3), // Light background for the bars
-                            ),
-                          ),
-                        ],
+        ),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Select Date Range: ',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.calendar_today, color: Colors.white),
+                    onPressed: () async {
+                      final DateTimeRange? picked = await showDateRangePicker(
+                        context: context,
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2101),
                       );
-                    }).toList(),
-                    titlesData: FlTitlesData(
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          interval: calculateInterval(),
-                          getTitlesWidget: (value, meta) {
-                            // Round the value to the nearest integer
-                            String roundedValue = value.toInt().toString(); // Rounds to the nearest integer
-                            return Text(
-                              roundedValue,
-                              style: TextStyle(fontSize: 12), // Adjust font size as needed
-                            );
-                          },
-                          reservedSize: 40, // Ensure space for the left titles
-                        ),
-                      ),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            int index = value.toInt();
-                            if (index < groupedSales.keys.length) {
-                              String dateLabel = groupedSales.keys.elementAt(index);
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 10.0),
-                                child: Text(
-                                  dateLabel,
-                                  style: TextStyle(fontSize: 10),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              );
-                            }
-                            return Text('');
-                          },
-                          reservedSize: 50,
-                          interval: 1,
-                        ),
-                      ),
+                      if (picked != null && picked != selectedDateRange) {
+                        setState(() {
+                          selectedDateRange = picked;
+                        });
+                        loadSales();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.arrow_left, color: Colors.white),
+                    onPressed: () {
+                      scrollChart(-100); // Scroll left by 100 pixels
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.arrow_right, color: Colors.white),
+                    onPressed: () {
+                      scrollChart(100); // Scroll right by 100 pixels
+                    },
+                  ),
+                ],
+              ),
+            ),
+            Divider(
+              color: Colors.white,
+              thickness: 1,
+              indent: 20,
+              endIndent: 20,
+            ),
+            groupedSales.isEmpty
+                ? Center(child: CircularProgressIndicator())
+                : Expanded(
+              flex: 2,
+              child: SingleChildScrollView(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                child: SizedBox(
+                  width: groupedSales.length * 80.0,
+                  child: SfCartesianChart(
+                    primaryXAxis: CategoryAxis(
+                      labelRotation: 45,
+                      title: AxisTitle(text: 'Date'),
+                      labelStyle: TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.bold),
                     ),
-                    borderData: FlBorderData(show: false),
-                    barTouchData: BarTouchData(enabled: true),
-                    gridData: FlGridData(show: true),
+                    primaryYAxis: NumericAxis(
+                      title: AxisTitle(text: 'Total Sales'),
+                      interval: calculateInterval(),
+                      numberFormat: NumberFormat.simpleCurrency(),
+                      labelStyle: TextStyle(
+                          fontSize: 12, fontWeight: FontWeight.bold),
+                    ),
+                    series: <CartesianSeries>[
+                      ColumnSeries<MapEntry<String, double>, String>(
+                        dataSource: groupedSales.entries.toList(),
+                        xValueMapper: (MapEntry<String, double> sales, _) => sales.key,
+                        yValueMapper: (MapEntry<String, double> sales, _) => sales.value,
+                        pointColorMapper: (MapEntry<String, double> sales, _) {
+                          return getColorForSales(sales.value);
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-          ),
-          Divider(),
-          Expanded(
-            flex: 3,
-            child: ListView.builder(
-              itemCount: groupedSales.length,
-              itemBuilder: (context, index) {
-                String date = groupedSales.keys.elementAt(index);
-                double totalPrice = groupedSales[date]!;
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text('Date: $date'),
-                    subtitle: Text('Total Price: \$${totalPrice.toStringAsFixed(2)}'),
-                  ),
-                );
-              },
+            Divider(
+              color: Colors.white,
+              thickness: 1,
+              indent: 20,
+              endIndent: 20,
             ),
-          ),
-        ],
+            Expanded(
+              flex: 3,
+              child: ListView.builder(
+                itemCount: groupedSales.length,
+                itemBuilder: (context, index) {
+                  String date = groupedSales.keys.elementAt(index);
+                  double totalPrice = groupedSales[date]!;
+                  return Card(
+                    margin: EdgeInsets.all(12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    elevation: 5,
+                    child: ListTile(
+                      title: Text(
+                        'Date: $date',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      subtitle: Text(
+                        'Total Price: \$${totalPrice.toStringAsFixed(2)}',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.blueGrey,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  double calculateInterval() {
+    if (groupedSales.isEmpty) return 10;
+    double maxValue = groupedSales.values.reduce((a, b) => a > b ? a : b);
+    return (maxValue / 5).ceilToDouble();
+  }
+
+  Color getColorForSales(double salesValue) {
+    if (salesValue > 1000) {
+      return Colors.green;
+    } else if (salesValue > 500) {
+      return Colors.orange;
+    } else {
+      return Colors.red;
+    }
   }
 }

@@ -101,20 +101,40 @@ class _CreateSalesState extends State<CreateSales> {
       final quantityText = quantityControllers[i].text;
       final quantity = int.tryParse(quantityText) ?? 0;
 
-      if (selectedProduct != null && (selectedProduct.stock ?? 0) < quantity) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Requested quantity for ${selectedProduct.name} exceeds available stock (${selectedProduct.stock ?? 0}).',
+      if (selectedProduct != null) {
+        // Check if requested quantity exceeds stock
+        if ((selectedProduct.stock ?? 0) < quantity) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Requested quantity for ${selectedProduct.name} exceeds available stock (${selectedProduct.stock ?? 0}).',
+              ),
+              backgroundColor: Colors.red,
             ),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return false;
+          );
+          return false;
+        }
+
+        // Check if the product is expired
+        if (selectedProduct != null &&
+            selectedProduct.expiryDate != null &&
+            DateTime.parse(selectedProduct.expiryDate!).isBefore(DateTime.now())) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Product ${selectedProduct.name} has expired. Cannot create sales with expired products.',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return false;
+        }
+
       }
     }
     return true;
   }
+
 
   void _createSales() async {
     if (_formKey.currentState!.validate() && salesDate != null && _validateQuantities()) {
@@ -268,7 +288,11 @@ class _CreateSalesState extends State<CreateSales> {
                       onPressed: _addProductField,
                       icon: Icon(Icons.add),
                       label: Text('Add Product'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green, // Set the background color to green
+                      ),
                     ),
+
                     ElevatedButton.icon(
                       onPressed: () {
                         setState(() {

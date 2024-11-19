@@ -1,6 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:point_of_sale/page/LogoutPage.dart';
+import 'package:point_of_sale/page/Login.dart';
 import 'package:point_of_sale/page/Sales/AllSalesView.dart';
+import 'package:point_of_sale/page/Sales/CreateSales.dart';
 import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
 import 'package:point_of_sale/page/Sales/CustomerReoprts.dart';
 import 'package:point_of_sale/page/Sales/SalesChart.dart';
@@ -67,65 +70,105 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   final List<Map<String, String>> myItems = [
-    {"img": "https://cdn-icons-png.flaticon.com/128/7466/7466065.png", "title": "Products"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/9119/9119160.png", "title": "Customers"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/10103/10103393.png", "title": "Purchase"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/3211/3211610.png", "title": "Sale"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/7661/7661842.png", "title": "Purchase List"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "Sales List"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/3534/3534063.png", "title": "Reports"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/7314/7314637.png", "title": "Profit/Loss"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/2738/2738236.png", "title": "Due List"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Stock List"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/1728/1728912.png", "title": "Ledger"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/407/407826.png", "title": "Warehouse"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/3135/3135679.png", "title": "Income"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/3886/3886981.png", "title": "Expense"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/10364/10364864.png", "title": "Mortgage"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/10686/10686242.png", "title": "Tax Reports"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/17718/17718145.png", "title": "User Role"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/12668/12668466.png", "title": "Manufacture"},
     {"img": "https://cdn-icons-png.flaticon.com/128/1362/1362944.png", "title": "Category"},
     {"img": "https://cdn-icons-png.flaticon.com/128/3321/3321752.png", "title": "Supplier"},
     {"img": "https://cdn-icons-png.flaticon.com/128/13163/13163163.png", "title": "Branch"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/7466/7466065.png", "title": "Products"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/3211/3211610.png", "title": "Sale"},
+
+    {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "Sales Deatails"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "View Sales"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/9119/9119160.png", "title": "Customers"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Dhanmondi Branch Stock List"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Banai Branch Stock List"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Gulshan Branch Stock List"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "Sales Chart"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/17718/17718145.png", "title": "User Role"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/10103/10103393.png", "title": "Purchase"},
+    //
+    // {"img": "https://cdn-icons-png.flaticon.com/128/7661/7661842.png", "title": "Purchase List"},
+    //
+    // {"img": "https://cdn-icons-png.flaticon.com/128/3534/3534063.png", "title": "Reports"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/7314/7314637.png", "title": "Profit/Loss"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/2738/2738236.png", "title": "Due List"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Stock List"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/1728/1728912.png", "title": "Ledger"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/407/407826.png", "title": "Warehouse"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/3135/3135679.png", "title": "Income"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/3886/3886981.png", "title": "Expense"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/10364/10364864.png", "title": "Mortgage"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/10686/10686242.png", "title": "Tax Reports"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/17718/17718145.png", "title": "User Role"},
+    // {"img": "https://cdn-icons-png.flaticon.com/128/12668/12668466.png", "title": "Manufacture"},
+
+
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundImage: NetworkImage(
-                "https://i.postimg.cc/GhsGhb3K/0050785.jpg",
-              ),
-            ),
-            const SizedBox(width: 10),
-            const Text("Towhid Medical"),
-          ],
-        ),
+        title: Text('Towhid Medical'),
+        centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.lightGreenAccent, Colors.lightBlue],
+              colors: [Colors.orange, Colors.lightGreenAccent, Colors.yellowAccent], // Gradient colors
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
-        elevation: 10,
-        actions: [
-          IconButton(
-            onPressed: () {}, // Add your functionality here
-            icon: const Icon(Icons.phone, color: Colors.lightGreenAccent),
-          ),
-          IconButton(
-            onPressed: () {}, // Add your functionality here
-            icon: const Icon(Icons.video_collection_sharp, color: Colors.red),
-          ),
-        ],
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Colors.lightGreenAccent),
+              accountName: const Text(
+                "Md Towhidul Alam",
+                style: TextStyle(color: Colors.black),
+              ),
+              accountEmail: const Text(
+                "alammdtowhidul9@gmail.com",
+                style: TextStyle(color: Colors.black),
+              ),
+              currentAccountPicture: Image.network(
+                "https://i.postimg.cc/ry95B8nc/download-9.jpg",
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.login),
+              title: const Text("Login"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => Login()));
+              },
+            ),
+
+
+            ListTile(
+              leading: const Icon(Icons.phone),
+              title: const Text("Contact"),
+              onTap: () {
+                // Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text("Profile"),
+              onTap: () {
+                // Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPage()));
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => LogoutPage()));
+              },
+            ),
+          ],
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(15.0),
@@ -182,67 +225,82 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       title: myItems[index]["title"]!,
                       onTap: () {
                         // Navigate based on index
-                        if (index == 18) {
+                        if (index == 0) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => AllCategoryView()),
                           );
-                        } else if (index == 19) {
+                        } else if (index == 1) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => SupplierListView()),
                           );
-                        } else if (index == 20) {
+                        } else if (index == 2) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => AllBranchesView()),
                           );
-                        } else if (index == 0) {
+                        } else if (index == 3) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => AllProductView()),
                           );
-                        } else if (index == 3) {
+                        } else if (index == 4) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => CreateSales()),
+                          );
+                        }
+                        // else if (index == 1) {
+                        //   Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(builder: (context) => CreateSalesBananiBranch()),
+                        //   );
+                        // }
+
+                        else if (index == 5) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => ViewSalesDetailsScreen()),
                           );
-                        } else if (index == 16) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AllCategoryView()),
-                          );
-                        }else if (index == 1) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => CreateSalesBananiBranch()),
-                          );
-                        }else if (index == 9) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AllProductStockDhanmondi()),
-                          );
-                        }else if (index == 10) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AllProductStockBanani()),
-                          );
-                        }else if (index == 11) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => AllProductStockGulshan()),
-                          );
-                        }else if (index == 5) {
+                        }
+                        else if (index == 6) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => ViewSales()),
                           );
-                        }else if (index == 12) {
+                        }
+
+                        else if (index == 7) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => CustomerReports()),
                           );
-                        }else if (index == 13) {
+                        }
+                        else if (index == 8) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AllProductStockDhanmondi()),
+                          );
+                        }else if (index == 9) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AllProductStockBanani()),
+                          );
+                        }else if (index == 10) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AllProductStockGulshan()),
+                          );
+                        }
+
+                       else if (index == 11) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => SalesChart()),
+                          );
+                        }
+                        else if (index == 12) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => SalesChart()),
@@ -354,4 +412,6 @@ class _HoverCardState extends State<HoverCard> with SingleTickerProviderStateMix
       ),
     );
   }
+
 }
+

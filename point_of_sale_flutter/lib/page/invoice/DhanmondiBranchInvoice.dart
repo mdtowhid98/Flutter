@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:point_of_sale/page/Home.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdf;
@@ -164,13 +165,33 @@ class InvoicePage extends StatelessWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _printInvoice,
-        icon: Icon(Icons.print),
-        label: Text("Print"),
-        backgroundColor: Colors.blue,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // Print Button
+          // FloatingActionButton.extended(
+          //   onPressed: _printInvoice,
+          //   icon: Icon(Icons.print),
+          //   label: Text("Print"),
+          //   backgroundColor: Colors.blue,
+          // ),
+          // SizedBox(width: 16),
+          // Home Button
+          FloatingActionButton(
+            onPressed: () {
+              // Navigate to Home Page
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => Home()),
+              );// Or use Navigator.pushNamed() if you have named routes
+            },
+            child: Icon(Icons.home),
+            backgroundColor: Colors.lightGreenAccent,
+          ),
+        ],
       ),
     );
+
   }
 
   // Format date function

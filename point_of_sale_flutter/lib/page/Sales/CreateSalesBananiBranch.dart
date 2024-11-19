@@ -1,12 +1,10 @@
 import 'package:date_field/date_field.dart';
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
-
 import 'package:point_of_sale/page/invoice/BananiBranchInvoice.dart';
-
+import 'package:point_of_sale/page/invoice/DhanmondiBranchInvoice.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 import 'package:point_of_sale/service/SalesService.dart';
-
 
 class CreateSalesBananiBranch extends StatefulWidget {
   @override
@@ -31,7 +29,7 @@ class _CreateSalesBananiBranchState extends State<CreateSalesBananiBranch> {
   @override
   void initState() {
     super.initState();
-    _getAllBanaiBranchProducts();
+    _getAllBananiBranchProducts();
     quantityControllers.forEach((controller) {
       controller.addListener(_updateTotalPrice);
     });
@@ -46,7 +44,7 @@ class _CreateSalesBananiBranchState extends State<CreateSalesBananiBranch> {
     super.dispose();
   }
 
-  Future<void> _getAllBanaiBranchProducts() async {
+  Future<void> _getAllBananiBranchProducts() async {
     try {
       products = await productService.getAllBananiBranchProducts();
       setState(() {
@@ -88,6 +86,16 @@ class _CreateSalesBananiBranchState extends State<CreateSalesBananiBranch> {
     });
   }
 
+  void _removeProductField(int index) {
+    setState(() {
+      selectedProducts.removeAt(index);
+      quantityControllers[index].removeListener(_updateTotalPrice);
+      quantityControllers.removeAt(index).dispose();
+      unitPriceControllers.removeAt(index).dispose();
+    });
+    _updateTotalPrice();
+  }
+
   bool _validateQuantities() {
     for (int i = 0; i < selectedProducts.length; i++) {
       final selectedProduct = selectedProducts[i];
@@ -113,73 +121,92 @@ class _CreateSalesBananiBranchState extends State<CreateSalesBananiBranch> {
     if (_formKey.currentState!.validate() && salesDate != null && _validateQuantities()) {
       String customerName = customerNameController.text;
       double totalPrice = double.parse(totalPriceController.text);
-      List<Map<String, dynamic>> productsToSubmit = [];
 
-      // Collect the products with their respective quantities and set salesDetails
-      for (int i = 0; i < selectedProducts.length; i++) {
-        if (selectedProducts[i] != null) {
-          int quantity = int.tryParse(quantityControllers[i].text) ?? 0; // Ensure quantity is added here
-          productsToSubmit.add({
-            'id': selectedProducts[i]!.id,
-            'name': selectedProducts[i]!.name,
-            'quantity': quantity,
-            'unitprice': selectedProducts[i]!.unitprice,
+      List<Map> productsToSubmit = selectedProducts.asMap().entries.map((entry) {
+        int index = entry.key;
+        Product? product = entry.value;
+
+        if (product != null) {
+          int quantity = int.tryParse(quantityControllers[index].text) ?? 0;
+          product.quantity = quantity;
+          return {
+            'id': product.id,
+            'name': product.name,
+            'quantity': product.quantity,
+            'unitprice': product.unitprice,
             'salesDetails': {
-              'quantity': quantity, // Set the quantity for the product
-              'product': selectedProducts[i]!.toJson(), // Include product details
-              'totalPrice': (selectedProducts[i]!.unitprice! * quantity),
-              'discount': 0 // Add any discount logic here if needed
+              'quantity': product.quantity,
+              'product': product.toJson(),
+              'totalPrice': (product.unitprice! * quantity),
+              'discount': 0.0,
             },
-          });
+          };
         }
-      }
-
-      final nonNullSelectedProducts = selectedProducts.whereType<Product>().toList();
+        return {};
+      }).toList();
 
       final saleData = {
         'customername': customerName,
         'salesdate': salesDate!.toIso8601String(),
         'totalprice': totalPrice,
-        'product': productsToSubmit,  // Include quantity in the product data
+        'product': productsToSubmit,
       };
 
-      final response = await salesService.createSalesBananiBranch(
-        customerName,
-        salesDate!,
-        totalPrice.toInt(),
-        productsToSubmit.length,
-        nonNullSelectedProducts,
-      );
-
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        // Navigate to the invoice page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => InvoicePageBananiBranch(sale: saleData),
-          ),
+      try {
+        final response = await salesService.createSalesBananiBranch(
+          customerName,
+          salesDate!,
+          totalPrice.toInt(),
+          productsToSubmit.length,
+          selectedProducts.whereType<Product>().toList(),
         );
 
-        // Clear input fields after submission
-        customerNameController.clear();
-        totalPriceController.clear();
-        for (final controller in quantityControllers) {
-          controller.clear();
+        if (response.statusCode == 201 || response.statusCode == 200) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => InvoicePageBananiBranch(sale: saleData),
+            ),
+          );
+          _resetForm();
+        } else {
+          _showErrorDialog('Failed to create sales. Status: ${response.statusCode}');
         }
-        setState(() {
-          salesDate = DateTime.now();
-          selectedProducts = [null];
-          quantityControllers = [TextEditingController()];  // Reset quantities
-          unitPriceControllers = [TextEditingController()];
-        });
-      } else {
-        print('Sales creation failed with status: ${response.statusCode}');
+      } catch (e) {
+        _showErrorDialog('An error occurred: $e');
       }
     }
   }
 
+  void _resetForm() {
+    customerNameController.clear();
+    totalPriceController.clear();
+    for (final controller in quantityControllers) {
+      controller.clear();
+    }
+    setState(() {
+      salesDate = DateTime.now();
+      selectedProducts = [null];
+      quantityControllers = [TextEditingController()..addListener(_updateTotalPrice)];
+      unitPriceControllers = [TextEditingController()];
+    });
+  }
 
-
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -223,92 +250,127 @@ class _CreateSalesBananiBranchState extends State<CreateSalesBananiBranch> {
                   },
                 ),
                 SizedBox(height: 20),
-                ...List.generate(selectedProducts.length, (index) {
-                  return Column(
-                    children: [
-                      DropdownButtonFormField<Product>(
-                        value: selectedProducts[index],
-                        onChanged: (product) => _onProductSelected(product, index),
-                        decoration: InputDecoration(
-                          labelText: 'Product',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.category_outlined),
-                        ),
-                        items: products.map<DropdownMenuItem<Product>>((Product product) {
-                          return DropdownMenuItem<Product>(
-                            value: product,
-                            child: Text('${product.name} (Stock: ${product.stock})'),
-                          );
-                        }).toList(),
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Please select a product';
-                          }
-                          return null;
-                        },
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: _addProductField,
+                      icon: Icon(Icons.add),
+                      label: Text('Add Product'),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          selectedProducts.clear();
+                          quantityControllers.forEach((controller) => controller.dispose());
+                          unitPriceControllers.forEach((controller) => controller.dispose());
+                          quantityControllers.clear();
+                          unitPriceControllers.clear();
+                          selectedProducts.add(null);
+                          quantityControllers.add(TextEditingController()..addListener(_updateTotalPrice));
+                          unitPriceControllers.add(TextEditingController());
+                        });
+                        _updateTotalPrice();
+                      },
+                      icon: Icon(Icons.delete, color: Colors.red),
+                      label: Text('Remove All'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
                       ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: unitPriceControllers[index],
-                        decoration: InputDecoration(
-                          labelText: 'Unit Price',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.attach_money),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Column(
+                  children: List.generate(selectedProducts.length, (index) {
+                    return Column(
+                      children: [
+                        Row(
+                          children: [
+                            // Product Dropdown
+                            Expanded(
+                              child: DropdownButtonFormField<Product>(
+                                value: selectedProducts[index],
+                                onChanged: (product) => _onProductSelected(product, index),
+                                decoration: InputDecoration(
+                                  labelText: 'Select Product',
+                                  border: OutlineInputBorder(),
+                                ),
+                                items: products.map((product) {
+                                  return DropdownMenuItem<Product>(
+                                    value: product,
+                                    child: Text('${product.name ?? ''} (Stock: ${product.stock ?? 0})'),
+                                  );
+                                }).toList(),
+                                isExpanded: true,
+                                hint: Text('Select a product'),
+                                selectedItemBuilder: (context) {
+                                  return products.map((product) {
+                                    return Text('${product.name ?? ''} (Stock: ${product.stock ?? 0})');
+                                  }).toList();
+                                },
+                              ),
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.remove_circle, color: Colors.red),
+                              onPressed: () => _removeProductField(index),
+                            ),
+                          ],
                         ),
-                        readOnly: true,
-                      ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        controller: quantityControllers[index],
-                        decoration: InputDecoration(
-                          labelText: 'Quantity',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.production_quantity_limits),
+                        SizedBox(height: 10),
+                        // Row to display Quantity and Unit Price side by side
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: quantityControllers[index],
+                                decoration: InputDecoration(
+                                  labelText: 'Quantity',
+                                  border: OutlineInputBorder(),
+                                ),
+                                keyboardType: TextInputType.number,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a quantity';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 10), // Space between the fields
+                            Expanded(
+                              child: TextFormField(
+                                controller: unitPriceControllers[index],
+                                readOnly: true,
+                                decoration: InputDecoration(
+                                  labelText: 'Unit Price',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a quantity';
-                          }
-                          final quantity = int.tryParse(value);
-                          if (quantity == null || quantity <= 0) {
-                            return 'Enter a valid quantity';
-                          }
-                          final selectedProduct = selectedProducts[index];
-                          if (selectedProduct != null && quantity > (selectedProduct.stock ?? 0)) {
-                            return 'Exceeds stock quantity';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                    ],
-                  );
-                }),
+                        SizedBox(height: 10),
+                      ],
+                    );
+                  }),
+                ),
+
+                SizedBox(height: 20),
                 TextFormField(
                   controller: totalPriceController,
+                  readOnly: true,
                   decoration: InputDecoration(
                     labelText: 'Total Price',
                     border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.price_check),
                   ),
-                  readOnly: true,
-                ),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _addProductField,
-                  child: Text("Add Product"),
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _createSales,
-                  child: Text(
-                    "Create Sales",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
+                  child: Text('Create Sales'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blueAccent,
-                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.lightGreenAccent, // Set the background color to green
                   ),
                 ),
               ],

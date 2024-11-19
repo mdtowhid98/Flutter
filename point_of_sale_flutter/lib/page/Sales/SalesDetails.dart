@@ -61,17 +61,7 @@ class _ViewSalesDetailsScreenState extends State<ViewSalesDetailsScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            ElevatedButton(
-              onPressed: () {
-                // Navigate to the CreateSales screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CreateSales()),
-                );
-              },
-              child: Text('Create Sales'),
-            ),
-            SizedBox(height: 10),
+
             TextField(
               decoration: InputDecoration(
                 labelText: 'Search by Customer Name or Sales ID',

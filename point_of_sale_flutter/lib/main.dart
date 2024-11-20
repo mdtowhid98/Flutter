@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:point_of_sale/page/Home.dart';
+import 'package:point_of_sale/page/HomePageDhanmondiBranch.dart';
 import 'package:point_of_sale/page/Login.dart';
 import 'package:point_of_sale/page/Registration.dart';
 

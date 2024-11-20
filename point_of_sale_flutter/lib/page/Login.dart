@@ -4,9 +4,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:http/http.dart' as http;
+import 'package:point_of_sale/page/HomePageBananiBranch.dart';
 import 'package:point_of_sale/page/LogoutPage.dart';
 import 'package:point_of_sale/page/BranchProfile.dart';
-import 'package:point_of_sale/page/Home.dart';
+import 'package:point_of_sale/page/HomePageDhanmondiBranch.dart';
 import 'package:point_of_sale/page/Registration.dart';
 import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
 import 'package:point_of_sale/page/category/AllCategoryView.dart';
@@ -47,7 +48,7 @@ class _LoginState extends State<Login> {
       } else if (role == 'USER') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AllCategoryView()),
+          MaterialPageRoute(builder: (context) => HomePageBananiBranc()),
         );
       } else {
         print('Unknown role: $role');

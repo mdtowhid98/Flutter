@@ -129,26 +129,45 @@ class _ViewSalesDetailsScreenState extends State<ViewSalesDetailsScreen> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: ListTile(
-              title: Text(
-                'Customer: ${sale.sale?.customername ?? 'N/A'}',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.indigo,
-                  fontSize: 17,
-                ),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              title: Row(
                 children: [
-                  Text('Sales ID: ${sale.id}'),
-                  Text('Quantity: ${sale.quantity}'),
-                  Text('Unit Price: \$${sale.unitPrice}'),
-                  Text(
-                    'Total Price: \$${sale.totalPrice}',
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: Text(
+                      'Customer: ${sale.sale?.customername ?? 'N/A'}',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.indigo,
+                        fontSize: 17,
+                      ),
                     ),
+                  ),
+                ],
+              ),
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Left side: Sales ID and Quantity
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Sales ID: ${sale.id}'),
+                      Text('Quantity: ${sale.quantity}'),
+                    ],
+                  ),
+                  // Right side: Unit Price and Total Price
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('Unit Price: \$${sale.unitPrice}'),
+                      Text(
+                        'Total Price: \$${sale.totalPrice}',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

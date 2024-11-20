@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:point_of_sale/page/Home.dart';
+import 'package:point_of_sale/page/HomePageDhanmondiBranch.dart';
+import 'package:point_of_sale/page/HomePageBananiBranch.dart';
 import 'package:printing/printing.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdf;
@@ -182,7 +183,7 @@ class InvoicePage extends StatelessWidget {
               // Navigate to Home Page
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => Home()),
+                MaterialPageRoute(builder: (context) => HomePageBananiBranc()),
               );// Or use Navigator.pushNamed() if you have named routes
             },
             child: Icon(Icons.home),

@@ -3,14 +3,14 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 
-class AllProductStockGulshan extends StatefulWidget with WidgetsBindingObserver {
-  const AllProductStockGulshan({super.key});
+class AllProductStockDhanmondi extends StatefulWidget with WidgetsBindingObserver {
+  const AllProductStockDhanmondi({super.key});
 
   @override
-  State<AllProductStockGulshan> createState() => _AllProductStockGulshanState();
+  State<AllProductStockDhanmondi> createState() => _AllProductStockDhanmondiState();
 }
 
-class _AllProductStockGulshanState extends State<AllProductStockGulshan> {
+class _AllProductStockDhanmondiState extends State<AllProductStockDhanmondi> {
   late Future<List<Product>> futureProducts;
   Map<int, bool> hoverStates = {};
   int? hoveredIndex;
@@ -29,13 +29,13 @@ class _AllProductStockGulshanState extends State<AllProductStockGulshan> {
   @override
   void initState() {
     super.initState();
-    futureProducts = ProductService().getAllGulshanBranchProducts();
+    futureProducts = ProductService().getAllDhanmondiBranchProducts();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      futureProducts = ProductService().getAllGulshanBranchProducts();
+      futureProducts = ProductService().getAllDhanmondiBranchProducts();
     }
   }
 
@@ -43,7 +43,7 @@ class _AllProductStockGulshanState extends State<AllProductStockGulshan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Gulshan Branch Stock'),
+        title: Text('Dhanmondi Branch Stock'),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(

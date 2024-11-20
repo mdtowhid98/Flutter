@@ -8,11 +8,12 @@ import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
 import 'package:point_of_sale/page/Sales/CustomerReoprts.dart';
 import 'package:point_of_sale/page/Sales/SalesChart.dart';
 import 'package:point_of_sale/page/Sales/SalesDetails.dart';
+import 'package:point_of_sale/page/UserRole.dart';
 
 import 'package:point_of_sale/page/branch/AllBranchView.dart';
 import 'package:point_of_sale/page/category/AllCategoryView.dart';
 import 'package:point_of_sale/page/product/AllProductView.dart';
-import 'package:point_of_sale/page/product/StockList.dart';
+import 'package:point_of_sale/page/product/StockListDhanmondiBranch.dart';
 import 'package:point_of_sale/page/product/StockListBanani.dart';
 import 'package:point_of_sale/page/product/StockListGulshan.dart';
 import 'package:point_of_sale/page/supplier/AllSupplierView.dart';
@@ -84,22 +85,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Gulshan Branch Stock List"},
     {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "Sales Chart"},
     {"img": "https://cdn-icons-png.flaticon.com/128/17718/17718145.png", "title": "User Role"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/10103/10103393.png", "title": "Purchase"},
-    //
-    // {"img": "https://cdn-icons-png.flaticon.com/128/7661/7661842.png", "title": "Purchase List"},
-    //
-    // {"img": "https://cdn-icons-png.flaticon.com/128/3534/3534063.png", "title": "Reports"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/7314/7314637.png", "title": "Profit/Loss"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/2738/2738236.png", "title": "Due List"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Stock List"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/1728/1728912.png", "title": "Ledger"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/407/407826.png", "title": "Warehouse"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/3135/3135679.png", "title": "Income"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/3886/3886981.png", "title": "Expense"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/10364/10364864.png", "title": "Mortgage"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/10686/10686242.png", "title": "Tax Reports"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/17718/17718145.png", "title": "User Role"},
-    // {"img": "https://cdn-icons-png.flaticon.com/128/12668/12668466.png", "title": "Manufacture"},
 
 
   ];
@@ -137,13 +122,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 "https://i.postimg.cc/ry95B8nc/download-9.jpg",
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.login),
-              title: const Text("Login"),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => Login()));
-              },
-            ),
+
 
 
             ListTile(
@@ -251,12 +230,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             MaterialPageRoute(builder: (context) => CreateSales()),
                           );
                         }
-                        // else if (index == 1) {
-                        //   Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(builder: (context) => CreateSalesBananiBranch()),
-                        //   );
-                        // }
+
 
                         else if (index == 5) {
                           Navigator.push(
@@ -303,7 +277,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         else if (index == 12) {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => SalesChart()),
+                            MaterialPageRoute(builder: (context) => UserRole()),
                           );
                         }
                       },

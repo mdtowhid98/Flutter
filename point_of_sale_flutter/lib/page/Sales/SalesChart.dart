@@ -93,7 +93,7 @@ class _SalesChartState extends State<SalesChart> {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
-                    icon: Icon(Icons.calendar_today, color: Colors.white),
+                    icon: Icon(Icons.calendar_today, color: Colors.red), // Red color for calendar button
                     onPressed: () async {
                       final DateTimeRange? picked = await showDateRangePicker(
                         context: context,
@@ -117,13 +117,13 @@ class _SalesChartState extends State<SalesChart> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_left, color: Colors.white),
+                    icon: Icon(Icons.arrow_left, color: Colors.red), // Red color for left arrow
                     onPressed: () {
                       scrollChart(-100); // Scroll left by 100 pixels
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.arrow_right, color: Colors.white),
+                    icon: Icon(Icons.arrow_right, color: Colors.red), // Red color for right arrow
                     onPressed: () {
                       scrollChart(100); // Scroll right by 100 pixels
                     },
@@ -148,7 +148,7 @@ class _SalesChartState extends State<SalesChart> {
                   width: groupedSales.length * 80.0,
                   child: SfCartesianChart(
                     primaryXAxis: CategoryAxis(
-                      labelRotation: 45,
+                      labelRotation: 0,
                       title: AxisTitle(text: 'Date'),
                       labelStyle: TextStyle(
                           fontSize: 12, fontWeight: FontWeight.bold),
@@ -227,7 +227,7 @@ class _SalesChartState extends State<SalesChart> {
 
   Color getColorForSales(double salesValue) {
     if (salesValue > 1000) {
-      return Colors.green;
+      return Colors.yellowAccent;
     } else if (salesValue > 500) {
       return Colors.orange;
     } else {

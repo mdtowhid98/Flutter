@@ -68,19 +68,12 @@ class _CustomerReportsState extends State<CustomerReports> with SingleTickerProv
     }
   }
 
-  // Function to determine a color for each bar based on the total price
+  // Function to determine a strong color for each bar based on the total price
   Color getBarColor(double totalPrice) {
-    if (totalPrice > 10000) {
-      return Colors.green;
-    } else if (totalPrice > 8000) {
-      return Colors.blue;
-    } else if (totalPrice > 5000) {
-      return Colors.orange;
-    } else if (totalPrice > 2000) {
-      return Colors.yellow;
-    } else {
-      return Colors.red;
-    }
+    // Generate a different color for each bar based on a range of sales
+    int hue = (totalPrice % 360).toInt(); // Use total price to vary hue
+    // Increase saturation and decrease lightness to make the color stronger
+    return HSLColor.fromAHSL(1.0, hue.toDouble(), 0.9, 0.6).toColor(); // More saturated, darker color
   }
 
   @override
@@ -100,78 +93,101 @@ class _CustomerReportsState extends State<CustomerReports> with SingleTickerProv
           ),
         ),
       ),
-      body: Column(
-        children: [
-          if (sales.isEmpty)
-            Center(child: CircularProgressIndicator())
-          else
-            Expanded(
-              child: Center( // Center the bar chart
-                child: AnimatedBuilder(
-                  animation: _animation,
-                  builder: (context, child) {
-                    return SfCartesianChart(
-                      primaryXAxis: CategoryAxis(),
-                      primaryYAxis: NumericAxis(),
-                      series: <CartesianSeries<MapEntry<String, double>, String>>[
-                        ColumnSeries<MapEntry<String, double>, String>(
-                          dataSource: customerTotalSales.entries.toList(),
-                          xValueMapper: (MapEntry<String, double> sales, _) => sales.key,
-                          yValueMapper: (MapEntry<String, double> sales, _) => sales.value,
-                          pointColorMapper: (MapEntry<String, double> sales, _) => getBarColor(sales.value),
-                          name: 'Total Sales',
-                        ),
-                      ],
-                    );
-                  },
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Colors.blue.withOpacity(0.5), // Light blue color
+              Colors.purple.withOpacity(0.5), // Light purple color
+            ], // You can customize these colors
+            stops: [0.0, 1.0], // Control the gradient flow
+          ),
+        ),
+        child: Column(
+          children: [
+            if (sales.isEmpty)
+              Center(child: CircularProgressIndicator())
+            else
+              Expanded(
+                child: Center( // Center the bar chart
+                  child: AnimatedBuilder(
+                    animation: _animation,
+                    builder: (context, child) {
+                      return SfCartesianChart(
+                        primaryXAxis: CategoryAxis(),
+                        primaryYAxis: NumericAxis(),
+                        series: <CartesianSeries<MapEntry<String, double>, String>>[
+                          ColumnSeries<MapEntry<String, double>, String>(
+                            dataSource: customerTotalSales.entries.toList(),
+                            xValueMapper: (MapEntry<String, double> sales, _) => sales.key,
+                            yValueMapper: (MapEntry<String, double> sales, _) => sales.value,
+                            pointColorMapper: (MapEntry<String, double> sales, _) => getBarColor(sales.value),
+                            name: 'Total Sales',
+                          ),
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
 
-          Expanded(
-            child: ListView.builder(
-              itemCount: customerTotalSales.length,
-              itemBuilder: (context, index) {
-                final customerName = customerTotalSales.keys.elementAt(index);
-                final totalPrice = customerTotalSales[customerName] ?? 0;
-                int starRating = getStarRating(totalPrice);
+            Expanded(
+              child: ListView.builder(
+                itemCount: customerTotalSales.length,
+                itemBuilder: (context, index) {
+                  final customerName = customerTotalSales.keys.elementAt(index);
+                  final totalPrice = customerTotalSales[customerName] ?? 0;
+                  int starRating = getStarRating(totalPrice);
 
-                return MouseRegion(
-                  onEnter: (_) {
-                    setState(() {
-                      // Track the hovered index if needed
-                    });
-                  },
-                  onExit: (_) {
-                    setState(() {
-                      // Reset hover state
-                    });
-                  },
-                  child: Card(
-                    margin: EdgeInsets.all(8.0),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: ListTile(
-                      title: Text('Customer: $customerName'),
-                      subtitle: Text('Total Price: \$${totalPrice.toStringAsFixed(2)}'),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(starRating, (index) {
-                          return Icon(
-                            Icons.star,
-                            color: Colors.redAccent,
-                            size: 20,
-                          );
-                        }),
+                  return MouseRegion(
+                    onEnter: (_) {
+                      setState(() {
+                        // Track the hovered index if needed
+                      });
+                    },
+                    onExit: (_) {
+                      setState(() {
+                        // Reset hover state
+                      });
+                    },
+                    child: Card(
+                      margin: EdgeInsets.all(8.0),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          'Customer: $customerName',
+                          style: TextStyle(
+                            color: Colors.black, // Blue color for customer name
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Total Price: \$${totalPrice.toStringAsFixed(2)}',
+                          style: TextStyle(
+                            color: Colors.blue, // Red color for total price
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(starRating, (index) {
+                            return Icon(
+                              Icons.star,
+                              color: Colors.redAccent,
+                              size: 20,
+                            );
+                          }),
+                        ),
                       ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -115,17 +115,33 @@ class ProductService {
   }
 
 
-  Future<void> updateProduct(int id, Product product) async {
+  // Future<void> updateProduct(int id, Product product) async {
+  //   final response = await http.put(
+  //     Uri.parse('http://localhost:8087/api/product/update/$id'),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //     },
+  //     body: jsonEncode(product.toJson()),
+  //   );
+  //
+  //   if (response.statusCode != 200) {
+  //     throw Exception('Failed to update supplier');
+  //   }
+  // }
+
+  Future<void> updateProduct(Product product) async {
+    if (product.id == null) {
+      throw Exception('Product ID is required for update');
+    }
+
     final response = await http.put(
-      Uri.parse('http://localhost:8087/api/product/update/$id'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
+      Uri.parse('$apiUrl${product.id}'),
+      headers: {"Content-Type": "application/json"},
       body: jsonEncode(product.toJson()),
     );
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update supplier');
+      throw Exception('Failed to update Product');
     }
   }
 

@@ -230,7 +230,19 @@ class _CreateSalesBananiBranchState extends State<CreateSalesBananiBranch> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Create Sales')),
+      appBar: AppBar(
+        title: Text('Create Sales Banani Branch'),
+        centerTitle: true,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange, Colors.lightGreenAccent, Colors.yellowAccent], // Gradient colors
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+      ),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: isLoading

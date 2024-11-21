@@ -4,7 +4,7 @@ import 'package:point_of_sale/model/SalesDetails.dart';
 import 'package:point_of_sale/page/LogoutPage.dart';
 import 'package:point_of_sale/page/Login.dart';
 import 'package:point_of_sale/page/Sales/AllSalesView.dart';
-import 'package:point_of_sale/page/Sales/CreateSales.dart';
+import 'package:point_of_sale/page/Sales/CreateSalesDhanmondiBranch.dart';
 import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
 import 'package:point_of_sale/page/Sales/CustomerReoprts.dart';
 import 'package:point_of_sale/page/Sales/SalesChart.dart';
@@ -19,14 +19,14 @@ import 'package:point_of_sale/page/product/StockListBanani.dart';
 import 'package:point_of_sale/page/product/StockListGulshan.dart';
 import 'package:point_of_sale/page/supplier/AllSupplierView.dart';
 
-class HomePageBananiBranc extends StatefulWidget {
-  const HomePageBananiBranc({super.key});
+class HomePageBananiBranch extends StatefulWidget {
+  const HomePageBananiBranch({super.key});
 
   @override
-  _HomePageBananiBrancState createState() => _HomePageBananiBrancState();
+  _HomePageBananiBranchState createState() => _HomePageBananiBranchState();
 }
 
-class _HomePageBananiBrancState extends State<HomePageBananiBranc> with TickerProviderStateMixin {
+class _HomePageBananiBranchState extends State<HomePageBananiBranch> with TickerProviderStateMixin {
   int _currentIndex = 0;
   int _carouselIndex = 0;
   late PageController _pageController;
@@ -72,19 +72,12 @@ class _HomePageBananiBrancState extends State<HomePageBananiBranc> with TickerPr
   }
 
   final List<Map<String, String>> myItems = [
-
     {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Banai Branch Stock List"},
-
     {"img": "https://cdn-icons-png.flaticon.com/128/3211/3211610.png", "title": "Sale"},
-
     {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "Sales Deatails"},
-
-    {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "Sales Chart"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/3258/3258522.png", "title": "Sales Chart"},
     {"img": "https://cdn-icons-png.flaticon.com/128/17718/17718145.png", "title": "User Role"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/9119/9119160.png", "title": "Customers"},
-
-
-
+    {"img": "https://cdn-icons-png.flaticon.com/128/17783/17783610.png", "title": "Customer Reports"},
   ];
 
   @override
@@ -120,22 +113,15 @@ class _HomePageBananiBrancState extends State<HomePageBananiBranc> with TickerPr
                 "https://i.postimg.cc/ry95B8nc/download-9.jpg",
               ),
             ),
-
-
-
             ListTile(
               leading: const Icon(Icons.phone),
               title: const Text("Contact"),
-              onTap: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPage()));
-              },
+              onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text("Profile"),
-              onTap: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPage()));
-              },
+              onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.logout),
@@ -153,9 +139,9 @@ class _HomePageBananiBrancState extends State<HomePageBananiBranc> with TickerPr
           color: Colors.grey[100],
           child: Column(
             children: [
-              // Carousel
+              // Carousel with extra padding
               ClipRRect(
-                borderRadius: BorderRadius.circular(10.0), // Adjust the radius as needed
+                borderRadius: BorderRadius.circular(10.0),
                 child: Container(
                   height: 80,
                   child: PageView.builder(
@@ -186,6 +172,7 @@ class _HomePageBananiBrancState extends State<HomePageBananiBranc> with TickerPr
                   ),
                 ),
               ),
+              const SizedBox(height: 30), // Extra space between carousel and grid
               // GridView with Hover Animation
               Expanded(
                 child: GridView.builder(
@@ -203,10 +190,10 @@ class _HomePageBananiBrancState extends State<HomePageBananiBranc> with TickerPr
                       onTap: () {
                         // Navigate based on index
                         if (index == 0) {
-                        Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AllProductStockBanani()),
-                        );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => AllProductStockBanani()),
+                          );
                         } else if (index == 1) {
                           Navigator.push(
                             context,
@@ -227,14 +214,12 @@ class _HomePageBananiBrancState extends State<HomePageBananiBranc> with TickerPr
                             context,
                             MaterialPageRoute(builder: (context) => UserRole()),
                           );
-                        }
-                        else if (index == 5) {
+                        } else if (index == 5) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => CustomerReports()),
                           );
                         }
-
                       },
                     );
                   },
@@ -247,6 +232,8 @@ class _HomePageBananiBrancState extends State<HomePageBananiBranc> with TickerPr
     );
   }
 }
+
+
 
 class HoverCard extends StatefulWidget {
   final String imgUrl;
@@ -292,7 +279,7 @@ class _HoverCardState extends State<HoverCard> with SingleTickerProviderStateMix
     return MouseRegion(
       onEnter: (_) {
         setState(() {
-          _borderColor = Colors.lightGreenAccent; // Change border color to green on hover
+          _borderColor = Colors.blue; // Change border color to green on hover
         });
         _controller.forward();
       },
@@ -306,34 +293,37 @@ class _HoverCardState extends State<HoverCard> with SingleTickerProviderStateMix
         onTap: widget.onTap,
         child: ScaleTransition(
           scale: _scaleAnimation,
-          child: Card(
-            elevation: 4, // Reduced the elevation for a lighter shadow
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8), // Smaller radius for the corners
-              side: BorderSide(color: _borderColor, width: 2), // Set the border color dynamically
-            ),
-            child: SizedBox(
-              width: 100, // Control the width of the card
-              height: 120, // Control the height of the card
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.network(
-                    widget.imgUrl,
-                    height: 40, // Reduced image height
-                    width: 40, // Reduced image width
-                  ),
-                  const SizedBox(height: 8), // Reduced spacing between image and text
-                  Text(
-                    widget.title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 12, // Reduced font size
-                      fontWeight: FontWeight.bold,
+          child: Container(  // Wrap the Card widget with a Container
+            color: Colors.lightGreenAccent,  // Set background color here
+            child: Card(
+              elevation: 4, // Reduced the elevation for a lighter shadow
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8), // Smaller radius for the corners
+                side: BorderSide(color: _borderColor, width: 2), // Set the border color dynamically
+              ),
+              child: SizedBox(
+                width: 100, // Control the width of the card
+                height: 120, // Control the height of the card
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.network(
+                      widget.imgUrl,
+                      height: 40, // Reduced image height
+                      width: 40, // Reduced image width
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8), // Reduced spacing between image and text
+                    Text(
+                      widget.title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12, // Reduced font size
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -341,6 +331,6 @@ class _HoverCardState extends State<HoverCard> with SingleTickerProviderStateMix
       ),
     );
   }
-
 }
+
 

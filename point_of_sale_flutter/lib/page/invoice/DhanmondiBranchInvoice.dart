@@ -183,7 +183,7 @@ class InvoicePage extends StatelessWidget {
               // Navigate to Home Page
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => HomePageBananiBranc()),
+                MaterialPageRoute(builder: (context) => Home()),
               );// Or use Navigator.pushNamed() if you have named routes
             },
             child: Icon(Icons.home),

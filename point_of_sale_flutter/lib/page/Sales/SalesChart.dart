@@ -205,7 +205,7 @@ class _SalesChartState extends State<SalesChart> {
                         'Total Price: \$${totalPrice.toStringAsFixed(2)}',
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.blueGrey,
+                          color: Colors.blue,
                         ),
                       ),
                     ),

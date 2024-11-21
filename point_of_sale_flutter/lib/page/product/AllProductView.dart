@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/page/product/CreateProduct.dart';
+import 'package:point_of_sale/page/product/UpdateProduct.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 
 class AllProductView extends StatefulWidget with WidgetsBindingObserver {
@@ -35,6 +36,17 @@ class _AllProductViewState extends State<AllProductView> {
     await ProductService().deleteProduct(product.id);
     setState(() {
       futureProducts = ProductService().fetchProducts();
+    });
+  }
+
+  void _updateProduct(Product product) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => UpdateProductPage(product: product)),
+    ).then((_) {
+      setState(() {
+        futureProducts = ProductService().fetchProducts();
+      });
     });
   }
 
@@ -146,69 +158,84 @@ class _AllProductViewState extends State<AllProductView> {
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
+                                          color: Colors.blue
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                     ),
                                     Text(
                                       'Unit Price: \$${product.unitprice ?? 'N/A'}',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black, // Set text color to red
+                                      ),
                                     ),
                                     Text(
                                       'Stock: ${product.stock ?? 'N/A'}',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(fontSize: 14,
+                                        color: Colors.black,
+                                      ),
                                     ),
                                     Text(
                                       'Manufacture Date: ${product.manufactureDate ?? 'N/A'}',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(fontSize: 14,color: Colors.blue,),
                                     ),
                                     Text(
                                       'Expiry Date: ${product.expiryDate ?? 'N/A'}',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(fontSize: 14,color: Colors.red,),
                                     ),
                                     Text(
                                       'Supplier: ${product.supplier?.name ?? 'Unknown Supplier'}',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(fontSize: 14,color: Colors.indigo,),
                                     ),
                                     Text(
                                       'Category: ${product.category?.categoryname ?? 'Unknown Category'}',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(fontSize: 14,color: Colors.indigo,),
                                     ),
                                     Text(
                                       'Branch: ${product.branch?.branchName ?? 'Unknown Branch'}',
-                                      style: TextStyle(fontSize: 14),
+                                      style: TextStyle(fontSize: 14,color: Colors.indigo,),
                                     ),
                                   ],
                                 ),
                               ),
-                              IconButton(
-                                icon: Icon(Icons.delete, color: Colors.red),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
-                                        title: Text('Delete Product'),
-                                        content: Text('Are you sure you want to delete this product?'),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('Cancel'),
-                                          ),
-                                          TextButton(
-                                            onPressed: () {
-                                              _deleteProduct(product);
-                                              Navigator.of(context).pop();
-                                            },
-                                            child: Text('Delete'),
-                                          ),
-                                        ],
+
+                              Row(
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit,color: Colors.blue),
+                                    onPressed: () => _updateProduct(product),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text('Delete Product'),
+                                            content: Text('Are you sure you want to delete this product?'),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text('Cancel'),
+                                              ),
+                                              TextButton(
+                                                onPressed: () {
+                                                  _deleteProduct(product);
+                                                  Navigator.of(context).pop();
+                                                },
+                                                child: Text('Delete'),
+                                              ),
+                                            ],
+                                          );
+                                        },
                                       );
                                     },
-                                  );
-                                },
+                                  ),
+                                ],
                               ),
                             ],
                           ),

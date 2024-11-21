@@ -13,10 +13,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
-
-
-
 class UserRole extends StatelessWidget {
   const UserRole({super.key});
 
@@ -319,7 +315,7 @@ class UserFeaturesScreen extends StatelessWidget {
                   _buildFeatureCard(
                       context,
                       'Inventory Management',
-                      'Track and update inventory in your branch',
+                      'Track inventory in your branch',
                       Icons.inventory_2
                   ),
                 ],

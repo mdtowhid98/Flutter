@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:point_of_sale/model/ProductModel.dart';
 import 'package:point_of_sale/page/LogoutPage.dart';
 import 'package:point_of_sale/page/Login.dart';
 import 'package:point_of_sale/page/Sales/AllSalesView.dart';
-import 'package:point_of_sale/page/Sales/CreateSales.dart';
+import 'package:point_of_sale/page/Sales/CreateSalesDhanmondiBranch.dart';
 import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
 import 'package:point_of_sale/page/Sales/CustomerReoprts.dart';
 import 'package:point_of_sale/page/Sales/SalesChart.dart';
@@ -13,10 +14,12 @@ import 'package:point_of_sale/page/UserRole.dart';
 import 'package:point_of_sale/page/branch/AllBranchView.dart';
 import 'package:point_of_sale/page/category/AllCategoryView.dart';
 import 'package:point_of_sale/page/product/AllProductView.dart';
+import 'package:point_of_sale/page/product/Notifications.dart';
 import 'package:point_of_sale/page/product/StockListDhanmondiBranch.dart';
 import 'package:point_of_sale/page/product/StockListBanani.dart';
 import 'package:point_of_sale/page/product/StockListGulshan.dart';
 import 'package:point_of_sale/page/supplier/AllSupplierView.dart';
+import 'package:point_of_sale/service/ProductService.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -30,6 +33,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   int _carouselIndex = 0;
   late PageController _pageController;
   Timer? _timer;
+  late Future<List<Product>> futureProducts;
+  int expiringProductsCount = 0; // Tracks the number of expiring products
+  Map<int, bool> hoverStates = {};
 
   static const List<String> _texts = [
     "মাসিক ও বার্ষিক প্যাকেজে ব্যাবসার সকল প্রয়োজনীয় \nফিচার নিয়ে দ্রুত ব্যবস্থপনায় এগিয়ে থাকুন।",
@@ -48,6 +54,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     super.initState();
     _pageController = PageController();
     _startAutoPageChange();
+    calculateExpiringProducts(); // Calculate expiring products on initialization
   }
 
   @override
@@ -70,6 +77,21 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     });
   }
 
+  // Calculate the number of products expiring within the next 3 days
+  void calculateExpiringProducts() async {
+    final now = DateTime.now();
+    final products = await ProductService().fetchProducts(); // Fetch product list
+    setState(() {
+      expiringProductsCount = products.where((product) {
+        if (product.expiryDate == null) return false; // Skip if expiry date is missing
+        final expiryDate = DateTime.parse(product.expiryDate!); // Parse expiry date
+        final difference = expiryDate.difference(now).inDays; // Calculate days to expiry
+        return difference >= 0 && difference < 3; // Check if within next 3 days
+      }).length;
+    });
+  }
+
+
   final List<Map<String, String>> myItems = [
     {"img": "https://cdn-icons-png.flaticon.com/128/1362/1362944.png", "title": "Category"},
     {"img": "https://cdn-icons-png.flaticon.com/128/3321/3321752.png", "title": "Supplier"},
@@ -78,12 +100,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     {"img": "https://cdn-icons-png.flaticon.com/128/3211/3211610.png", "title": "Sale"},
 
     {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "Sales Deatails"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "View Sales"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/9119/9119160.png", "title": "Customers"},
+
+    {"img": "https://cdn-icons-png.flaticon.com/128/17783/17783610.png", "title": "Customer Reports"},
     {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Dhanmondi Branch Stock List"},
     {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Banai Branch Stock List"},
     {"img": "https://cdn-icons-png.flaticon.com/128/15917/15917216.png", "title": "Gulshan Branch Stock List"},
-    {"img": "https://cdn-icons-png.flaticon.com/128/6632/6632834.png", "title": "Sales Chart"},
+    {"img": "https://cdn-icons-png.flaticon.com/128/3258/3258522.png", "title": "Sales Chart"},
     {"img": "https://cdn-icons-png.flaticon.com/128/17718/17718145.png", "title": "User Role"},
 
 
@@ -98,13 +120,59 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange, Colors.lightGreenAccent, Colors.yellowAccent], // Gradient colors
+              colors: [Colors.orange, Colors.lightGreenAccent, Colors.blueAccent], // Gradient colors
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
           ),
         ),
+        actions: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: Icon(
+                  Icons.notifications,
+                  color: Colors.lightGreenAccent, // Set the color to green
+                ),
+                onPressed: () {
+                  // Navigate to the notification page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Notifications()),
+                  );
+                },
+              ),
+              if (expiringProductsCount > 0)
+                Positioned(
+                  right: 16,
+                  top: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    constraints: BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '$expiringProductsCount', // Display count of expiring products
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ],
       ),
+
       drawer: Drawer(
         child: ListView(
           children: [
@@ -122,22 +190,15 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 "https://i.postimg.cc/ry95B8nc/download-9.jpg",
               ),
             ),
-
-
-
             ListTile(
               leading: const Icon(Icons.phone),
               title: const Text("Contact"),
-              onTap: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPage()));
-              },
+              onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text("Profile"),
-              onTap: () {
-                // Navigator.push(context, MaterialPageRoute(builder: (_) => AdminPage()));
-              },
+              onTap: () {},
             ),
             ListTile(
               leading: const Icon(Icons.logout),
@@ -188,6 +249,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   ),
                 ),
               ),
+              // Add gap between carousel and grid
+              SizedBox(height: 20), // Adjust height as needed
+
               // GridView with Hover Animation
               Expanded(
                 child: GridView.builder(
@@ -229,52 +293,37 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             context,
                             MaterialPageRoute(builder: (context) => CreateSales()),
                           );
-                        }
-
-
-                        else if (index == 5) {
+                        } else if (index == 5) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => ViewSalesDetailsScreen()),
                           );
-                        }
-                        else if (index == 6) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ViewSales()),
-                          );
-                        }
-
-                        else if (index == 7) {
+                        } else if (index == 6) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => CustomerReports()),
                           );
-                        }
-                        else if (index == 8) {
+                        } else if (index == 7) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => AllProductStockDhanmondi()),
                           );
-                        }else if (index == 9) {
+                        } else if (index == 8) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => AllProductStockBanani()),
                           );
-                        }else if (index == 10) {
+                        } else if (index == 9) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => AllProductStockGulshan()),
                           );
-                        }
-
-                       else if (index == 11) {
+                        } else if (index == 10) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => SalesChart()),
                           );
-                        }
-                        else if (index == 12) {
+                        } else if (index == 11) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => UserRole()),
@@ -291,6 +340,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       ),
     );
   }
+
 }
 
 class HoverCard extends StatefulWidget {
@@ -337,7 +387,7 @@ class _HoverCardState extends State<HoverCard> with SingleTickerProviderStateMix
     return MouseRegion(
       onEnter: (_) {
         setState(() {
-          _borderColor = Colors.lightGreenAccent; // Change border color to green on hover
+          _borderColor = Colors.blue; // Change border color to green on hover
         });
         _controller.forward();
       },
@@ -351,34 +401,37 @@ class _HoverCardState extends State<HoverCard> with SingleTickerProviderStateMix
         onTap: widget.onTap,
         child: ScaleTransition(
           scale: _scaleAnimation,
-          child: Card(
-            elevation: 4, // Reduced the elevation for a lighter shadow
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8), // Smaller radius for the corners
-              side: BorderSide(color: _borderColor, width: 2), // Set the border color dynamically
-            ),
-            child: SizedBox(
-              width: 100, // Control the width of the card
-              height: 120, // Control the height of the card
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Image.network(
-                    widget.imgUrl,
-                    height: 40, // Reduced image height
-                    width: 40, // Reduced image width
-                  ),
-                  const SizedBox(height: 8), // Reduced spacing between image and text
-                  Text(
-                    widget.title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 12, // Reduced font size
-                      fontWeight: FontWeight.bold,
+          child: Container(  // Wrap the Card widget with a Container
+            color: Colors.lightGreenAccent,  // Set background color here
+            child: Card(
+              elevation: 4, // Reduced the elevation for a lighter shadow
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8), // Smaller radius for the corners
+                side: BorderSide(color: _borderColor, width: 2), // Set the border color dynamically
+              ),
+              child: SizedBox(
+                width: 100, // Control the width of the card
+                height: 120, // Control the height of the card
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Image.network(
+                      widget.imgUrl,
+                      height: 40, // Reduced image height
+                      width: 40, // Reduced image width
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8), // Reduced spacing between image and text
+                    Text(
+                      widget.title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12, // Reduced font size
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -386,6 +439,6 @@ class _HoverCardState extends State<HoverCard> with SingleTickerProviderStateMix
       ),
     );
   }
-
 }
+
 

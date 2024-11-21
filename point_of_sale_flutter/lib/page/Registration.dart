@@ -23,11 +23,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool _isLoading = false; // For showing the loading animation
 
   final _formKey = GlobalKey<FormState>();
 
   void _register() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true; // Start loading
+      });
+
       String uName = name.text;
       String uEmail = email.text;
       String uPassword = password.text;
@@ -36,15 +41,25 @@ class _RegistrationPageState extends State<RegistrationPage> {
       String uGender = selectedGender ?? 'Other';
       String uDob = selectedDOB != null ? selectedDOB!.toIso8601String() : '';
 
-      final response = await _sendDataToBackend(uName, uEmail, uPassword, uCell, uAddress, uGender, uDob);
+      try {
+        final response = await _sendDataToBackend(
+          uName, uEmail, uPassword, uCell, uAddress, uGender, uDob,
+        );
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
-        print('Registration successful!');
-      } else if (response.statusCode == 409) {
-        print('User already exists!');
-      } else {
-        print('Registration failed with status: ${response.statusCode}');
+        if (response.statusCode == 201 || response.statusCode == 200) {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+          print('Registration successful!');
+        } else if (response.statusCode == 409) {
+          print('User already exists!');
+        } else {
+          print('Registration failed with status: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('An error occurred: $e');
+      } finally {
+        setState(() {
+          _isLoading = false; // Stop loading
+        });
       }
     }
   }
@@ -141,7 +156,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
                         SizedBox(height: 16),
                         _buildGenderSelection(),
                         SizedBox(height: 20),
-                        ElevatedButton(
+                        _isLoading
+                            ? CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+                            : ElevatedButton(
                           onPressed: _register,
                           child: Text(
                             "Register",
@@ -210,8 +227,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
             onToggleVisibility(!isVisible);
           },
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 8), // Adjust vertical padding for smaller height
-        isDense: true, // Makes the text field more compact
+        contentPadding: EdgeInsets.symmetric(vertical: 8),
+        isDense: true,
       ),
       obscureText: !isVisible,
       style: TextStyle(color: Colors.white, fontSize: 12),

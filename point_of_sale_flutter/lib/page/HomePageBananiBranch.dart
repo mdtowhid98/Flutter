@@ -45,9 +45,9 @@ class _HomePageBananiBranchState extends State<HomePageBananiBranch> {
   ];
 
   final List<String> _carouselImages = [
-    "https://media.istockphoto.com/id/1220303230/vector/social-distancing-during-the-covid-19-pandemic.jpg?s=612x612&w=0&k=20&c=I7Xv5ZAEeL4BYKvj_Ta9_W_D2k17h_VS3mgQhjaDl_4=",
     "https://media.istockphoto.com/id/1227011225/vector/people-in-protective-masks-are-in-the-queue-to-the-cashier-keeping-social-distance-safe.jpg?s=612x612&w=0&k=20&c=XnRL2Fd_w_GIQF-kLw99ScXxLAJaMov_V2cMIC4adQI=",
-    "https://media.istockphoto.com/id/1219131407/vector/safe-grocery-shopping-during-coronavirus-epidemic.jpg?s=612x612&w=0&k=20&c=u6NU2xwygGanSEZvypjRhbLanlvG6TeUo9a2tyKr6Vc="
+    "https://t4.ftcdn.net/jpg/02/74/73/01/240_F_274730109_gF0azWfAPbZFLr06yKbFu8S5CPSNMYJs.jpg",
+    "https://media.istockphoto.com/id/1220303230/vector/social-distancing-during-the-covid-19-pandemic.jpg?s=612x612&w=0&k=20&c=I7Xv5ZAEeL4BYKvj_Ta9_W_D2k17h_VS3mgQhjaDl_4="
   ];
 
   late PageController _pageController;
@@ -109,7 +109,7 @@ class _HomePageBananiBranchState extends State<HomePageBananiBranch> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Towhid Medical Banani Branch'),
+        title: const Text('Banani Branch'),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(

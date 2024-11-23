@@ -72,7 +72,7 @@ class _AllProductViewState extends State<AllProductView> {
           title: Text('Products'),
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.arrow_back),
               onPressed: () {
                 Navigator.push(
                   context,

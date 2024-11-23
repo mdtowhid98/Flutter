@@ -40,8 +40,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   Map<int, bool> hoverStates = {};
 
   final List<String> _carouselImages = [
-    "https://media.istockphoto.com/id/1265012638/vector/welcome.jpg?s=612x612&w=0&k=20&c=BbE9Mln5eFDq18YbLkH8sy5TbhAFix6_x7IE6v-Wu2w=",
     "https://media.istockphoto.com/id/1227011225/vector/people-in-protective-masks-are-in-the-queue-to-the-cashier-keeping-social-distance-safe.jpg?s=612x612&w=0&k=20&c=XnRL2Fd_w_GIQF-kLw99ScXxLAJaMov_V2cMIC4adQI=",
+    "https://t4.ftcdn.net/jpg/02/74/73/01/240_F_274730109_gF0azWfAPbZFLr06yKbFu8S5CPSNMYJs.jpg",
     "https://media.istockphoto.com/id/1220303230/vector/social-distancing-during-the-covid-19-pandemic.jpg?s=612x612&w=0&k=20&c=I7Xv5ZAEeL4BYKvj_Ta9_W_D2k17h_VS3mgQhjaDl_4="
   ];
 
@@ -128,7 +128,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Towhid Medical'),
+        title: Text('Departmental Store'),
         centerTitle: true,
         flexibleSpace: Container(
           decoration: BoxDecoration(

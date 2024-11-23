@@ -37,10 +37,10 @@ class _LoginState extends State<Login> {
       final role = await authService.getUserRole(); // Get role from AuthService
 
       if (role == 'PHARMACIST') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => CreateSalesBananiBranch()),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => CreateSalesBananiBranch()),
+        // );
       } else if (role == 'ADMIN') {
         Navigator.pushReplacement(
           context,

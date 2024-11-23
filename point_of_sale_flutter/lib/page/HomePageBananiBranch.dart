@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:point_of_sale/page/Login.dart';
 import 'package:point_of_sale/page/Sales/CreateSalesBananiBranch.dart';
 import 'package:point_of_sale/page/Sales/CustomerReoprts.dart';
 import 'package:point_of_sale/page/Sales/SalesChart.dart';
 import 'package:point_of_sale/page/Sales/SalesDetails.dart';
 import 'package:point_of_sale/page/UserRole.dart';
 import 'package:point_of_sale/page/product/StockListBanani.dart';
+import 'package:point_of_sale/service/AuthService.dart';
 
 class HomePageBananiBranch extends StatefulWidget {
   const HomePageBananiBranch({super.key});
@@ -117,6 +119,76 @@ class _HomePageBananiBranchState extends State<HomePageBananiBranch> {
               end: Alignment.bottomRight,
             ),
           ),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              decoration: const BoxDecoration(color: Colors.lightGreenAccent),
+              accountName: const Text(
+                "Md Towhidul Alam",
+                style: TextStyle(color: Colors.black),
+              ),
+              accountEmail: const Text(
+                "alammdtowhidul9@gmail.com",
+                style: TextStyle(color: Colors.black),
+              ),
+              currentAccountPicture: Image.network(
+                "https://i.postimg.cc/ry95B8nc/download-9.jpg",
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.phone),
+              title: const Text("Contact"),
+              onTap: () {
+                // Handle Contact navigation or functionality
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text("Profile"),
+              onTap: () {
+                // Handle Profile navigation or functionality
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text("Logout"),
+              onTap: () async {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Logout Confirmation"),
+                      content: const Text("Are you sure you want to logout?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            // Close the dialog without logging out
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            // Perform logout and navigate to login
+                            await AuthService().logout();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => Login()),
+                            );
+                          },
+                          child: const Text("Logout"),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
+            ),
+
+          ],
         ),
       ),
       body: Padding(

@@ -19,6 +19,7 @@ import 'package:point_of_sale/page/product/StockListDhanmondiBranch.dart';
 import 'package:point_of_sale/page/product/StockListBanani.dart';
 import 'package:point_of_sale/page/product/StockListGulshan.dart';
 import 'package:point_of_sale/page/supplier/AllSupplierView.dart';
+import 'package:point_of_sale/service/AuthService.dart';
 import 'package:point_of_sale/service/ProductService.dart';
 
 class Home extends StatefulWidget {
@@ -206,23 +207,57 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             ListTile(
               leading: const Icon(Icons.phone),
               title: const Text("Contact"),
-              onTap: () {},
+              onTap: () {
+                // Handle Contact navigation or functionality
+              },
             ),
             ListTile(
               leading: const Icon(Icons.person),
               title: const Text("Profile"),
-              onTap: () {},
+              onTap: () {
+                // Handle Profile navigation or functionality
+              },
             ),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text("Logout"),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (_) => LogoutPage()));
+              onTap: () async {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: const Text("Logout Confirmation"),
+                      content: const Text("Are you sure you want to logout?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            // Close the dialog without logging out
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("Cancel"),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            // Perform logout and navigate to login
+                            await AuthService().logout();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => Login()),
+                            );
+                          },
+                          child: const Text("Logout"),
+                        ),
+                      ],
+                    );
+                  },
+                );
               },
             ),
+
           ],
         ),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(15.0),
         child: Container(

@@ -1,0 +1,54 @@
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    id "dev.flutter.flutter-gradle-plugin"
+}
+
+android {
+    namespace 'com.example.task_management'
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    defaultConfig {
+        // Unique Application ID for your app
+        applicationId "com.example.task_management"
+
+        // Set min, target, and compile SDK versions
+        minSdk = flutter.minSdkVersion
+        targetSdk = flutter.targetSdkVersion
+        compileSdk = flutter.compileSdkVersion
+
+        // Explicitly set version code and version name to avoid errors
+        versionCode 1 // Change this number as you release new versions
+        versionName "1.0.0" // Follow semantic versioning (major.minor.patch)
+    }
+
+    buildTypes {
+        release {
+            // Enables code shrinking, obfuscation, and resource shrinking
+            minifyEnabled true
+            shrinkResources true
+
+            // Use proguard rules for obfuscation
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            // TODO: Replace with your release signing config if needed
+            signingConfig signingConfigs.debug
+        }
+    }
+
+}
+
+flutter {
+    source = "../.."
+}
